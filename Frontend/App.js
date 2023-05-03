@@ -2,15 +2,18 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, I18nManager, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MapBox from './src/components/MapBox';
+import Parking from './src/components/Parking';
+import Profile from './src/components/Profile';
 
-function HomeScreen() {
+function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Welcome, Moshe!</Text>
-      <MapBox />
+      <MapBox navigation={navigation} />
       <StatusBar style="auto" />
     </View>
   );
@@ -20,6 +23,23 @@ I18nManager.allowRTL(false);
 
 export default function App() {
   const Tab = createBottomTabNavigator();
+  const HomeStack = createNativeStackNavigator();
+
+  function HomeStackScreen() {
+    return (
+      <HomeStack.Navigator>
+        <HomeStack.Screen
+          options={{ headerShown: false }}
+          name="Map"
+          component={HomeScreen}
+        />
+        <HomeStack.Screen
+          name="Parking"
+          component={Parking}
+        />
+      </HomeStack.Navigator>
+    );
+  }
 
   return (
     <NavigationContainer style={styles.navigator}>
@@ -29,7 +49,7 @@ export default function App() {
             let iconName;
 
             if (route.name === 'Home') {
-              iconName = focused ? 'map': 'map-outline';
+              iconName = focused ? 'map' : 'map-outline';
             } else if (route.name === 'Account') {
               iconName = focused ? 'person' : 'person-outline';
             }
@@ -49,13 +69,13 @@ export default function App() {
           headerStyle: {
             borderBottomWidth: 0.2,
           }
-      })}
+        })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Account" component={HomeScreen} />
+        <Tab.Screen name="Home" component={HomeStackScreen} />
+        <Tab.Screen name="Account" component={Profile} />
       </Tab.Navigator>
     </NavigationContainer>
-    
+
   );
 }
 
