@@ -91,5 +91,6 @@ const styles = StyleSheet.create({
     fontSize: 25,
     width: '100%',
     marginBottom: 15,
+    marginLeft: 4
   },
 });

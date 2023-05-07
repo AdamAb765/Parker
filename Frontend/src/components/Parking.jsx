@@ -8,10 +8,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Button } from "@react-native-material/core";
 
 export default function Parking({ navigation, route }) {
-    useEffect(() => {
-        console.log(route)
-    }, [route])
-
 
     return (
         <View style={styles.container}>

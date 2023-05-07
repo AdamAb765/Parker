@@ -10,8 +10,6 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import axios from 'axios';
 
 export default function MapBox({ navigation }) {
-  const HomeStack = createNativeStackNavigator();
-
   const [myLocation, setMyLocation] = useState(null);
   const [searchInput, setSearchInput] = useState(null)
 
@@ -51,6 +49,7 @@ export default function MapBox({ navigation }) {
     setMyLocation(location);
     return location
   };
+
   const goToMyLocation = async () => {
     location = await getMyLocation();
     if (location && mapRef.current) {
