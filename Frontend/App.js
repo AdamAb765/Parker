@@ -8,6 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MapBox from './src/components/MapBox';
 import Parking from './src/components/Parking';
 import Profile from './src/components/Profile';
+import AddParking from './src/components/AddParking';
 
 function HomeScreen({ navigation }) {
   return (
@@ -41,6 +42,38 @@ export default function App() {
     );
   }
 
+  const ProfileStackScreen = () => {
+    return (
+      <HomeStack.Navigator>
+        <HomeStack.Screen
+          options={{ headerShown: false }}
+          name="Account"
+          component={Profile}
+        />
+        <HomeStack.Screen
+          name="Edit Profile"
+          component={AddParking}
+        />
+        <HomeStack.Screen
+          name="Renting Now"
+          component={AddParking}
+        />
+        <HomeStack.Screen
+          name="Live Rents"
+          component={AddParking}
+        />
+        <HomeStack.Screen
+          name="Parking I've Rented"
+          component={AddParking}
+        />
+        <HomeStack.Screen
+          name="My Parking Spots"
+          component={AddParking}
+        />
+      </HomeStack.Navigator>
+    )
+  }
+
   return (
     <NavigationContainer style={styles.navigator}>
       <Tab.Navigator
@@ -72,7 +105,7 @@ export default function App() {
         })}
       >
         <Tab.Screen name="Home" component={HomeStackScreen} />
-        <Tab.Screen name="Account" component={Profile} />
+        <Tab.Screen name="Account" component={ProfileStackScreen} />
       </Tab.Navigator>
     </NavigationContainer>
 
