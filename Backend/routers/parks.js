@@ -1,23 +1,27 @@
 const { Router } = require("express");
+const Park = require('../models/Park')
+
 const app = Router();
 
-app.get("/parks", (req, res, next) => {
-  res.json([
-    {
-      Address: "Tel-Aviv, Eben Gaviroll",
-      Contact: "0522515944",
-      Price: "22.5",
-    },
-    { Address: "Bnei-Barak, Heletz", Contact: "0522515944", Price: "12.5" },
-    { Address: "Tel-Aviv, HaMasger", Contact: "0522515944", Price: "21" },
-    { Address: "Tel-Aviv, Savidor", Contact: "0522515944", Price: "14.5" },
-    { Address: "Glilot, military camp", Contact: "0522515944", Price: "10.5" },
-  ]);
+app.get("/parks", async (req, res, next) => {
+  const allParks = await Park.find();
+  console.log("====" + allParks);
+  res.send(allParks);
+
 });
 
 app.post("/RegisterPark", (req, res) => {
-  console.log(req.body);
-  res.send("POST request to register a park");
+  const {park} = req.body;
+  const newPark = new Park(park);
+  newPark
+      .save()
+      .then(() => {
+        console.log("Successfully added park!");
+        // res.redirect("/");
+        res.send("Added successfully");
+      })
+      .catch((err) => console.log(err));
+
 });
 
 app.post("/DocumentPark", (req, res) => {
