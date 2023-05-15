@@ -1,11 +1,13 @@
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
-
-    client: String,
+    id: Number,
+    parkId: Number,
+    payment: Number,
+    consumerId: Number,
+    vehicleSerial: Number,
     timeStart: String,
     timeEnd: String,
-    isFinished: Boolean
 });
 
 module.exports = new mongoose.model("Order", OrderSchema);
