@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const ParkSchema = new mongoose.Schema({
-
     ownerId: Number,
     accesableHours: String,
     price: Number,

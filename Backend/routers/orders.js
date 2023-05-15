@@ -22,10 +22,10 @@ app.get("/orderByConsumer/:id", async (req, res, next) => {
   res.json(order);
 });
 
-app.post("/DocumentPark", (req, res) => {
+app.post("/documentPark", (req, res) => {
   const { order } = req.body;
   const newOrder = new Order(order);
-  newOrder["timeStart"] = time();
+  newOrder.timeStart = time();
   newOrder
     .save()
     .then(() => {
@@ -34,12 +34,12 @@ app.post("/DocumentPark", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-app.put("/editOrder", async (req, res) => {
+app.put("/editDocument", async (req, res) => {
   console.log("update: " + req.body);
   const { order } = req.body;
-  const { id } = { order };
+  const { _id } = { order };
 
-  const query = { id: id };
+  const query = { _id: _id };
   const doc = await Order.findOneAndUpdate(query, order, {
     returnOriginal: false,
   });
@@ -49,8 +49,6 @@ app.put("/editOrder", async (req, res) => {
 
 const time = () => {
   let dateObject = new Date();
-  console.log("A date object is defined")
-  
   let date = ("0" + dateObject.getDate()).slice(-2);
   let month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
   let year = dateObject.getFullYear();
@@ -59,9 +57,9 @@ const time = () => {
   let minutes = dateObject.getMinutes();
   let seconds = dateObject.getSeconds();
   
-  console.log("\displaying date and time in yyyy-mm-dd format")
-  
-  console.log(year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds);
+  const currTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
+  console.log(currTime);
+  return(currTime);
 };
 
 module.exports = app;
