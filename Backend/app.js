@@ -5,7 +5,7 @@ const vehicles = require("./routers/vehicles");
 const users = require("./routers/users");
 const orders = require("./routers/orders");
 
-const db_url = "mongodb://localhost:27017/parker";
+const db_url = "mongodb://localhost:27018/parker";
 
 mongoose.connect(db_url, {
   useNewUrlParser: true,
@@ -17,6 +17,10 @@ const app = express();
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// parks.use("/parks", (req, res, next) => {
+//   console.log("Hello to parks");
+//   next();
+// });
 
 // routes
 app.use(parks);

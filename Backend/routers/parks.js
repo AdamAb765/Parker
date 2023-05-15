@@ -8,7 +8,7 @@ app.get("/parks", async (req, res, next) => {
   res.json(allParks);
 });
 
-app.get("/park/:id", async (req, res, next) => {
+app.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   const park = await Park.findById(id);
   if (!park) {

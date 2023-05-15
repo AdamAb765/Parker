@@ -34,6 +34,20 @@ app.post("/documentPark", (req, res) => {
     .catch((err) => console.log(err));
 });
 
+app.put("/finishPark", async (req, res) => {
+  const { order } = req.body;
+  const { _id } = { order };
+  const query = { _id: _id };
+  const timeEnd = { timeEnd: time() };
+  
+  const doc = await Order.findOneAndUpdate(query, timeEnd, {
+    returnOriginal: false,
+  });
+
+  res.json(doc);
+});
+
+
 app.put("/editDocument", async (req, res) => {
   console.log("update: " + req.body);
   const { order } = req.body;
