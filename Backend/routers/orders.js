@@ -3,29 +3,26 @@ const Order = require("../models/Order");
 
 const app = Router();
 
-app.get("/orders", async (req, res, next) => {
+app.get("/", async (req, res, next) => {
   const allOrders = await Order.find();
   res.json(allOrders);
 });
 
+app.get("/:id", async (req, res, next) => {
+  const query = { _id: req.params._id };
+
+  const order = await Order.find(query);
+  res.json(order);
+});
+
 app.get("/orderByConsumer/:consumerId", async (req, res, next) => {
-  const { consumerId } = req.params;
-  const query = { consumerId: consumerId };
+  const query = { consumerId: req.params.consumerId };
   const order = await Order.find(query);
   res.json(order);
 });
 
-app.get("/orderByConsumer/:id", async (req, res, next) => {
-  const { id } = req.params;
-  const query = { id: id };
-  const order = await Order.find(query);
-  res.json(order);
-});
-
-app.post("/documentPark", (req, res) => {
-  const { order } = req.body;
-  const newOrder = new Order(order);
-  newOrder.timeStart = time();
+app.post("/create", (req, res) => {
+  const newOrder = new Order({ ...req.body.order, timeStart: time() });
   newOrder
     .save()
     .then(() => {
@@ -35,11 +32,13 @@ app.post("/documentPark", (req, res) => {
 });
 
 app.put("/finishPark", async (req, res) => {
-  const { order } = req.body;
-  const { _id } = { order };
+  // 1
+  const { order: { _id } } = req.body;
   const query = { _id: _id };
+  // 2
+  // const { order: { _id: query } } = req.body;
+
   const timeEnd = { timeEnd: time() };
-  
   const doc = await Order.findOneAndUpdate(query, timeEnd, {
     returnOriginal: false,
   });
@@ -48,12 +47,11 @@ app.put("/finishPark", async (req, res) => {
 });
 
 
-app.put("/editDocument", async (req, res) => {
+app.put("/edit", async (req, res) => {
   console.log("update: " + req.body);
-  const { order } = req.body;
-  const { _id } = { order };
-
+  const { order: { _id } } = req.body;
   const query = { _id: _id };
+  
   const doc = await Order.findOneAndUpdate(query, order, {
     returnOriginal: false,
   });

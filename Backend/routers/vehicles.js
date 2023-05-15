@@ -2,12 +2,12 @@ const { Router } = require("express");
 const Vehicle = require('../models/Vehicle')
 const app = Router();
 
-app.get("/vehicles", async (req, res, next) => {
+app.get("/", async (req, res, next) => {
   const allVehicles = await Vehicle.find();
   res.json(allVehicles);
 });
 
-app.get("/vehicle/:serial", async (req, res, next) => {
+app.get("/:serial", async (req, res, next) => {
   const {serial} = req.params;
   const query = {'serial': serial};
   const vehicle = await Vehicle.findOne(query);
@@ -21,7 +21,7 @@ app.get("/vehicleByOwner/:ownerId", async (req, res, next) => {
   res.json(vehicle);
 });
 
-app.post("/newVehicle", (req, res) => {
+app.post("/create", (req, res) => {
   const {vehicle} = req.body;
   const newVehicle = new Vehicle(vehicle);
   newVehicle
@@ -32,7 +32,7 @@ app.post("/newVehicle", (req, res) => {
       .catch(err => console.log(err));
 });
 
-app.put("/editVehicle", async (req, res) => {
+app.put("/edit", async (req, res) => {
   console.log("update: " + req.body);
   const {vehicle} = req.body;
   const {serial} = {vehicle};

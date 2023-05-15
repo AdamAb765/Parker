@@ -17,16 +17,12 @@ const app = express();
 // middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// parks.use("/parks", (req, res, next) => {
-//   console.log("Hello to parks");
-//   next();
-// });
 
 // routes
-app.use(parks);
-app.use(orders);
-app.use(vehicles);
-app.use(users);
+app.use("/parks", parks);
+app.use("/orders", orders);
+app.use("/vehicles", vehicles);
+app.use("/users", users);
 
 // server config
 app.listen(3000, () => {

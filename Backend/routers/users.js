@@ -2,19 +2,19 @@ const { Router } = require("express");
 const User = require('../models/User')
 const app = Router();
 
-app.get("/users", async (req, res, next) => {
+app.get("/", async (req, res, next) => {
   const allUsers = await User.find();
   res.json(allUsers);
 });
 
-app.get("/user/:id", async (req, res, next) => {
+app.get("/:id", async (req, res, next) => {
   const {id} = req.params;
   const user = await User.findById(id);
   res.json(user);
 });
 
 
-app.post("/newUser", (req, res) => {
+app.post("/create", (req, res) => {
   // console.log("Supplier params:" + req.body);
   const {user} = req.body;
   const newUser = new User(user);
@@ -26,7 +26,7 @@ app.post("/newUser", (req, res) => {
       .catch(err => console.log(err));
 });
 
-app.put("/editUser", async (req, res) => {
+app.put("/edit", async (req, res) => {
   console.log("update: " + req.body);
   const {user} = req.body;
   const {id} = {user};
