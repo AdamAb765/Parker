@@ -9,6 +9,10 @@ import MapBox from './src/components/MapBox';
 import Parking from './src/components/Parking';
 import Profile from './src/components/Profile';
 import AddParking from './src/components/AddParking';
+import MyVehicles from './src/components/MyVehicles';
+import MyParkingSpots from './src/components/MyParkingSpots';
+import RentingHistory from './src/components/RentingHistory';
+import AddCar from './src/components/AddCar';
 
 function HomeScreen({ navigation }) {
   return (
@@ -25,6 +29,7 @@ I18nManager.allowRTL(false);
 export default function App() {
   const Tab = createBottomTabNavigator();
   const HomeStack = createNativeStackNavigator();
+  const ProfileStack = createNativeStackNavigator();
 
   function HomeStackScreen() {
     return (
@@ -44,33 +49,33 @@ export default function App() {
 
   const ProfileStackScreen = () => {
     return (
-      <HomeStack.Navigator>
-        <HomeStack.Screen
+      <ProfileStack.Navigator>
+        <ProfileStack.Screen
           options={{ headerShown: false }}
           name="Account"
           component={Profile}
         />
-        <HomeStack.Screen
+        <ProfileStack.Screen
           name="Edit Profile"
           component={AddParking}
         />
-        <HomeStack.Screen
-          name="Renting Now"
-          component={AddParking}
+        <ProfileStack.Screen
+          name="My Vehicles"
+          component={MyVehicles}
         />
-        <HomeStack.Screen
-          name="Live Rents"
-          component={AddParking}
+        <ProfileStack.Screen
+          name="Add Car"
+          component={AddCar}
         />
-        <HomeStack.Screen
-          name="Parking I've Rented"
-          component={AddParking}
-        />
-        <HomeStack.Screen
+        <ProfileStack.Screen
           name="My Parking Spots"
-          component={AddParking}
+          component={MyParkingSpots}
         />
-      </HomeStack.Navigator>
+        <ProfileStack.Screen
+          name="Rent History"
+          component={RentingHistory}
+        />
+      </ProfileStack.Navigator>
     )
   }
 

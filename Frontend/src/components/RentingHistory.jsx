@@ -7,7 +7,7 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
 
-export default function MyParkingSpots({ navigation, route }) {
+export default function RentingHistory({ navigation, route }) {
     const [useMyLocation, setUseMyLocation] = useState(false)
     const [titleInput, setTitleInput] = useState('')
     const [descriptionInput, setDescriptionInput] = useState('')

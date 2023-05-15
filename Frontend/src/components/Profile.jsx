@@ -112,24 +112,10 @@ export default function Profile({ navigation, route }) {
                         <Icon name="chevron-right" size={24} />
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Renting Now')}>
+                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('My Vehicles')}>
                     <View style={styles.optionBody}>
                         <Text adjustsFontSizeToFit
-                            style={styles.optionText}>Renting In Live</Text>
-                        <Icon name="chevron-right" size={24} />
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Live Rents')}>
-                    <View style={styles.optionBody}>
-                        <Text adjustsFontSizeToFit
-                            style={styles.optionText}>Renting Out Live</Text>
-                        <Icon name="chevron-right" size={24} />
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate(`Parkings I've Rented`)}>
-                    <View style={styles.optionBody}>
-                        <Text adjustsFontSizeToFit
-                            style={styles.optionText}>Parkings I've Rented</Text>
+                            style={styles.optionText}>My Vehicles</Text>
                         <Icon name="chevron-right" size={24} />
                     </View>
                 </TouchableOpacity>
@@ -137,6 +123,13 @@ export default function Profile({ navigation, route }) {
                     <View style={styles.optionBody}>
                         <Text adjustsFontSizeToFit
                             style={styles.optionText}>My Parking Spots</Text>
+                        <Icon name="chevron-right" size={24} />
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Rent History')}>
+                    <View style={styles.optionBody}>
+                        <Text adjustsFontSizeToFit
+                            style={styles.optionText}>Rent History</Text>
                         <Icon name="chevron-right" size={24} />
                     </View>
                 </TouchableOpacity>

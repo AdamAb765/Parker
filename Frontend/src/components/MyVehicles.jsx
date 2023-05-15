@@ -7,7 +7,7 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
 
-export default function MyParkingSpots({ navigation, route }) {
+export default function MyVehicles({ navigation, route }) {
     const [useMyLocation, setUseMyLocation] = useState(false)
     const [titleInput, setTitleInput] = useState('')
     const [descriptionInput, setDescriptionInput] = useState('')
@@ -38,14 +38,14 @@ export default function MyParkingSpots({ navigation, route }) {
                         <View style={styles.statsBox}>
                             <Text style={styles.statsLabel}>You can add and edit your vehicles here!</Text>
                         </View>
-                        <Button title="Add Car" color='blue' style={styles.addBtn} />
+                        <Button title="Add Car" color='blue' style={styles.addBtn}  onPress={() => navigation.navigate('Add Car')} />
                     </View>
                 </View>
             </View>
             <View style={styles.carsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
                     {images.map((image, index) => (
-                        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Rent History')}>
+                        <TouchableOpacity style={styles.option}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
                                     style={styles.optionText}>Skoda Fabia - 63349501</Text>
