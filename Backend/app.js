@@ -1,8 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const parks = require("./routers/parks");
-const suplliers = require("./routers/suppliers");
-const clients = require("./routers/clients");
+const vehicles = require("./routers/vehicles");
+const users = require("./routers/users");
+const orders = require("./routers/orders");
 
 const db_url = "mongodb://localhost:27017/parker";
 
@@ -19,8 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes
 app.use(parks);
-app.use(suplliers);
-app.use(clients);
+app.use(orders);
+app.use(vehicles);
+app.use(users);
 
 // server config
 app.listen(3000, () => {

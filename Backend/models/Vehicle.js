@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const VehicleSchema = new mongoose.Schema({
-
     serial: Number,
     color: String,
     brand: String,

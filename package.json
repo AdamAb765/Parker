@@ -4,6 +4,7 @@
   "description": "parker",
   "main": "app.js",
   "scripts": {
+    "dev": "DEBUG=app:* nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
