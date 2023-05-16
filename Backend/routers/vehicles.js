@@ -2,28 +2,26 @@ const { Router } = require("express");
 const Vehicle = require('../models/Vehicle')
 const app = Router();
 
+
 app.get("/", async (req, res, next) => {
   const allVehicles = await Vehicle.find();
   res.json(allVehicles);
 });
 
 app.get("/:serial", async (req, res, next) => {
-  const {serial} = req.params;
-  const query = {'serial': serial};
+  const query = {'serial': req.params.serial};
   const vehicle = await Vehicle.findOne(query);
   res.json(vehicle);
 });
 
 app.get("/vehicleByOwner/:ownerId", async (req, res, next) => {
-  const {ownerId} = req.params;
-  const query = {'ownerId': ownerId};
+  const query = {'ownerId': req.params.ownerId};
   const vehicle = await Vehicle.findOne(query);
   res.json(vehicle);
 });
 
 app.post("/create", (req, res) => {
-  const {vehicle} = req.body;
-  const newVehicle = new Vehicle(vehicle);
+  const newVehicle = new Vehicle(req.body.vehicle);
   newVehicle
       .save()
       .then(() => {
@@ -33,11 +31,9 @@ app.post("/create", (req, res) => {
 });
 
 app.put("/edit", async (req, res) => {
-  console.log("update: " + req.body);
   const {vehicle} = req.body;
-  const {serial} = {vehicle};
 
-  const query = {'serial': serial};
+  const query = {'serial': vehicle.serial};
   const doc = await Vehicle.findOneAndUpdate(query, vehicle, {
     returnOriginal: false
   });

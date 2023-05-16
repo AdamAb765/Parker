@@ -22,7 +22,8 @@ app.get("/orderByConsumer/:consumerId", async (req, res, next) => {
 });
 
 app.post("/create", (req, res) => {
-  const newOrder = new Order({ ...req.body.order, timeStart: time() });
+  const initialOrder = { timeStart: time(), timeEnd: "" };
+  const newOrder = new Order({ ...req.body.order, ...initialOrder });
   newOrder
     .save()
     .then(() => {
@@ -32,10 +33,8 @@ app.post("/create", (req, res) => {
 });
 
 app.put("/finishPark", async (req, res) => {
-  // 1
   const { order: { _id } } = req.body;
   const query = { _id: _id };
-  // 2
   // const { order: { _id: query } } = req.body;
 
   const timeEnd = { timeEnd: time() };
@@ -48,10 +47,9 @@ app.put("/finishPark", async (req, res) => {
 
 
 app.put("/edit", async (req, res) => {
-  console.log("update: " + req.body);
-  const { order: { _id } } = req.body;
-  const query = { _id: _id };
-  
+  const { order } = req.body;
+  const query = { _id: order._id };
+
   const doc = await Order.findOneAndUpdate(query, order, {
     returnOriginal: false,
   });
@@ -64,14 +62,14 @@ const time = () => {
   let date = ("0" + dateObject.getDate()).slice(-2);
   let month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
   let year = dateObject.getFullYear();
-  
+
   let hours = dateObject.getHours();
   let minutes = dateObject.getMinutes();
   let seconds = dateObject.getSeconds();
-  
+
   const currTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
   console.log(currTime);
-  return(currTime);
+  return (currTime);
 };
 
 module.exports = app;

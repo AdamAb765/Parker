@@ -9,13 +9,13 @@ app.get("/", async (req, res, next) => {
 
 app.get("/:id", async (req, res, next) => {
   const {id} = req.params;
-  const user = await User.findById(id);
+  const filter = {id: id}
+  const user = await User.findOne(filter);
   res.json(user);
 });
 
 
 app.post("/create", (req, res) => {
-  // console.log("Supplier params:" + req.body);
   const {user} = req.body;
   const newUser = new User(user);
   newUser
@@ -29,8 +29,7 @@ app.post("/create", (req, res) => {
 app.put("/edit", async (req, res) => {
   console.log("update: " + req.body);
   const {user} = req.body;
-  const {id} = {user};
-  const query = {'id': id};
+  const query = {'id': user.id};
 
   const doc = await User.findOneAndUpdate(query, user, {
     returnOriginal: false

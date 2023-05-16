@@ -37,9 +37,8 @@ app.post("/create", (req, res) => {
 });
 
 app.put("/edit", async (req, res) => {
-  const { park : {_id}} = req.body;
-
-  const query = { _id: _id };
+  const { park} = req.body;
+  const query = { _id: park._id };
   const doc = await Park.findOneAndUpdate(query, park, {
     returnOriginal: false,
   });
