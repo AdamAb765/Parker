@@ -8,27 +8,25 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
 
 export default function MyParkingSpots({ navigation, route }) {
-    const [useMyLocation, setUseMyLocation] = useState(false)
-    const [titleInput, setTitleInput] = useState('')
-    const [descriptionInput, setDescriptionInput] = useState('')
-    const [locationInput, setLocationInput] = useState('')
+    const [isRequestingParkings, setIsRequestingParkings] = useState(true)
+    const [myParkingSpots, setMyParkingSpots] = useState([]);
 
-    const [images, setImages] = useState([
-        'https://www.bootdey.com/image/280x280/FF00FF/000000',
-        'https://www.bootdey.com/image/280x280/00FFFF/000000',
-        'https://www.bootdey.com/image/280x280/FF7F50/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/DC143C/000000',
-        'https://www.bootdey.com/image/280x280/FF00FF/000000',
-        'https://www.bootdey.com/image/280x280/00FFFF/000000',
-        'https://www.bootdey.com/image/280x280/FF7F50/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-
-
-    ]);
-
+    useEffect(() => {
+        //request cars
+        setMyParkingSpots([{
+            title: 'Parking in middle of Tel Aviv',
+            location: 'Rotschild 69 Tel Aviv',
+            owner: {
+                firstName: 'Adam',
+                lastName: 'Abraham',
+                contact: '0528535752'
+            },
+            price: '15',
+            instructions: 'Call when reached the parking',
+            imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
+        }])
+        setIsRequestingParkings(false)
+    }, [])
 
     return (
         <View style={styles.container}>
@@ -36,19 +34,19 @@ export default function MyParkingSpots({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <View style={styles.statsContainer}>
                         <View style={styles.statsBox}>
-                            <Text style={styles.statsLabel}>You can add and edit your vehicles here!</Text>
+                            <Text style={styles.statsLabel}>You can add and edit your parkings here!</Text>
                         </View>
-                        <Button title="Add Car" color='blue' style={styles.addBtn} />
+                        <Button title="Add Parking" color='blue' style={styles.addBtn} onPress={() => navigation.navigate('Add Parking')} />
                     </View>
                 </View>
             </View>
-            <View style={styles.carsHolder}>
+            <View style={styles.parkingsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
-                    {images.map((image, index) => (
-                        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Rent History')}>
+                    {myParkingSpots.map((parkingSpot, index) => (
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('My Parking', { ...parkingSpot })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
-                                    style={styles.optionText}>Skoda Fabia - 63349501</Text>
+                                    style={styles.optionText}>{parkingSpot.title}</Text>
                                 <Icon name="chevron-right" size={24} />
                             </View>
                         </TouchableOpacity>
@@ -96,7 +94,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     addBtn: {
-        width: '40%',
+        width: '50%',
         color: 'primary',
         alignSelf: 'center'
     },
@@ -128,7 +126,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 120,
     },
-    carsHolder: {
+    parkingsHolder: {
         height: '80%'
     }
 })

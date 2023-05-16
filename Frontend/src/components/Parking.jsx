@@ -1,58 +1,103 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Callout } from 'react-native-maps';
 import { Marker } from 'react-native-maps';
-import { StyleSheet, Image, Text, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Button } from "@react-native-material/core";
+import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
+import { CheckBox } from '@rneui/themed'
+import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'expo-image';
 
-export default function Parking({ navigation, route }) {
+export default function AddParking({ navigation, route }) {
+    const onRentParking = async () => {
+        let rentParking = true
+
+        //try rent parking
+
+        if (rentParking) {
+            Alert.alert('Success!', 'Parking rented successfully')
+        } else {
+            Alert.alert('Failed!', `Couldnt red parking. Please try again`)
+        }
+    }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>{route.params.title}</Text>
-
-            <View
-                style={{
-                    borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                }}
+            <View style={styles.header}>
+                <View style={styles.headerContent}>
+                    <Image style={styles.avatar}
+                        contentFit='contain'
+                        source={route.params.imageUrl}
+                        placeholder={require("../../assets/listing_parking_placeholder.png")} />
+                </View>
+            </View>
+            <TextInput
+                variant={'outlined'}
+                editable={false}
+                label='Parking Title'
+                style={styles.textInput}
+                value={route.params.title}
+                onChangeText={(newText) => setTitleInput(newText)}
             />
-
-            <Text style={styles.textStyle}>{route.params.description}</Text>
-            <Image style={styles.parkingImage} source={{ uri: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170" }} />
-            <Text style={styles.textStyle}>Price: 15 ILS per hour</Text>
-            <Text style={styles.textStyle}>Owner: Adam Abraham</Text>
-            <Text style={styles.textStyle}>Contact: 0521234567</Text>
-            <Text style={styles.textStyle}>Location: Rotschild 36 Tel Aviv</Text>
-            <Text style={styles.textStyle}>Parking Instructions: Call when reached parking</Text>
-            <Button title="Rent Parking" color="blue" onPress={() => Alert.alert("Success!", "Parking rented!")} />
+            <TextInput
+                variant={'outlined'}
+                editable={false}
+                style={styles.textInput}
+                label='Parking Instructions'
+                value={route.params.instructions}
+                onChangeText={(newText) => setInstructionsInput(newText)}
+            />
+            <TextInput
+                variant={'outlined'}
+                editable={false}
+                style={styles.textInput}
+                label='Parking Location'
+                value={route.params.location}
+                onChangeText={(newText) => setLocationInput(newText)}
+            />
+            <TextInput
+                variant={'outlined'}
+                editable={false}
+                style={styles.textInput}
+                label='Parking Price'
+                value={route.params.price + ' ILS Per Hour'}
+                onChangeText={(newText) => setLocationInput(newText)}
+            />
+            <Button title="Rent Parking" color="blue" onPress={onRentParking} />
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        display: "flex",
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        width: '100%'
+        justifyContent: 'space-evenly',
+        alignContent: 'center',
+        alignItems: 'center'
     },
     header: {
-        fontWeight: 'bold',
-        fontSize: 25,
-        marginBottom: 15,
+        height: '47.5%',
+        width: '100%'
     },
-    parkingImage: {
-        resizeMode: 'cover',
-        width: '60%',
-        height: '60%'
+    headerContent: {
+        alignItems: 'center',
     },
-    textStyle: {
-        marginBottom: 5
-    }
-});
+    avatar: {
+        width: 370,
+        height: 270,
+        marginTop: 10
+    },
+    name: {
+        fontSize: 22,
+        color: '#000000',
+        fontWeight: '600',
+    },
+    textInput: {
+        width: '70%',
+        height: '8%',
+        marginBottom: 5,
+    },
+})

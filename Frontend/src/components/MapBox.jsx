@@ -15,23 +15,39 @@ export default function MapBox({ navigation }) {
 
   const [markers, setMarkers] = useState([{ // Places around the michlala
     title: "Parking 1",
-    description: "20ILS per hour",
+    price: "20",
+    instructions: "Call when reached parking",
+    owner: {
+      firstName: 'Adam',
+      lastName: 'Abraham',
+      contact: '0528535752'
+    },
+    location: 'Rotschild 29 Tel Aviv',
     coordinate: {
       latitude: 31.970186,
       longitude: 34.770633,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01
-    }
+    },
+    imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
   }, {
     title: "Parking 2",
-    description: "15ILS per hour",
+    price: "20",
+    instructions: "Call when reached parking",
+    owner: {
+      firstName: 'Adam',
+      lastName: 'Abraham',
+      contact: '0528535752'
+    },
+    location: 'Rotschild 29 Tel Aviv',
     coordinate: {
       latitude: 31.970040,
       longitude: 34.773360,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01
-    }
-  }, ])
+    },
+    imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
+  },])
   const mapRef = useRef(null);
 
   const getMyLocation = async () => {
@@ -72,13 +88,21 @@ export default function MapBox({ navigation }) {
     if (myLocation && myLocation.coords.latitude && myLocation.coords.longitude) {
       setMarkers([...markers, {
         title: "Parking 3",
-        description: "15ILS per hour",
+        price: "20",
+        instructions: "Call when reached parking",
+        owner: {
+          firstName: 'Adam',
+          lastName: 'Abraham',
+          contact: '0528535752'
+        },
+        location: 'Rotschild 29 Tel Aviv',
         coordinate: {
           latitude: myLocation.coords.latitude,
           longitude: myLocation.coords.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01
-        }
+        },
+        imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
       }])
     }
   }, [myLocation])
@@ -124,7 +148,8 @@ export default function MapBox({ navigation }) {
             <Callout onPress={() => navigation.navigate('Parking', { ...marker })}>
               <View>
                 <Text>{marker.title}</Text>
-                <Text>{marker.description}</Text>
+                <Text>{marker.price} ILS Per Hour</Text>
+                <Text>{marker.location}</Text>
               </View>
             </Callout>
           </Marker>

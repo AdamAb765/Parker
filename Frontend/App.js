@@ -9,10 +9,12 @@ import MapBox from './src/components/MapBox';
 import Parking from './src/components/Parking';
 import Profile from './src/components/Profile';
 import AddParking from './src/components/AddParking';
-import MyVehicles from './src/components/MyVehicles';
+import MyCars from './src/components/MyCars';
 import MyParkingSpots from './src/components/MyParkingSpots';
 import RentingHistory from './src/components/RentingHistory';
 import AddCar from './src/components/AddCar';
+import MyCar from './src/components/MyCar';
+import MyParking from './src/components/MyParking';
 
 function HomeScreen({ navigation }) {
   return (
@@ -60,20 +62,32 @@ export default function App() {
           component={AddParking}
         />
         <ProfileStack.Screen
-          name="My Vehicles"
-          component={MyVehicles}
+          name="My Cars"
+          component={MyCars}
         />
         <ProfileStack.Screen
           name="Add Car"
           component={AddCar}
         />
         <ProfileStack.Screen
+          name="Add Parking"
+          component={AddParking}
+        />
+        <ProfileStack.Screen
           name="My Parking Spots"
           component={MyParkingSpots}
         />
         <ProfileStack.Screen
+          name="My Parking"
+          component={MyParking}
+        />
+        <ProfileStack.Screen
           name="Rent History"
           component={RentingHistory}
+        />
+        <ProfileStack.Screen
+          name="Car"
+          component={MyCar}
         />
       </ProfileStack.Navigator>
     )

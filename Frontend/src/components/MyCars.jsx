@@ -7,28 +7,20 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
 
-export default function MyVehicles({ navigation, route }) {
-    const [useMyLocation, setUseMyLocation] = useState(false)
-    const [titleInput, setTitleInput] = useState('')
-    const [descriptionInput, setDescriptionInput] = useState('')
-    const [locationInput, setLocationInput] = useState('')
+export default function MyCars({ navigation, route }) {
+    const [isRequestingCars, setIsRequestingCars] = useState(true)
+    const [cars, setCars] = useState([]);
 
-    const [images, setImages] = useState([
-        'https://www.bootdey.com/image/280x280/FF00FF/000000',
-        'https://www.bootdey.com/image/280x280/00FFFF/000000',
-        'https://www.bootdey.com/image/280x280/FF7F50/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/DC143C/000000',
-        'https://www.bootdey.com/image/280x280/FF00FF/000000',
-        'https://www.bootdey.com/image/280x280/00FFFF/000000',
-        'https://www.bootdey.com/image/280x280/FF7F50/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-
-
-    ]);
-
+    useEffect(() => {
+        //request cars
+        setCars([{
+            carNumber: '12345678',
+            carName: 'Skoda Fabia',
+            carColor: 'White',
+            imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg"
+        }])
+        setIsRequestingCars(false)
+    }, [])
 
     return (
         <View style={styles.container}>
@@ -38,17 +30,17 @@ export default function MyVehicles({ navigation, route }) {
                         <View style={styles.statsBox}>
                             <Text style={styles.statsLabel}>You can add and edit your vehicles here!</Text>
                         </View>
-                        <Button title="Add Car" color='blue' style={styles.addBtn}  onPress={() => navigation.navigate('Add Car')} />
+                        <Button title="Add Car" color='blue' style={styles.addBtn} onPress={() => navigation.navigate('Add Car')} />
                     </View>
                 </View>
             </View>
             <View style={styles.carsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
-                    {images.map((image, index) => (
-                        <TouchableOpacity style={styles.option}>
+                    {cars.map((car, index) => (
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...car })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
-                                    style={styles.optionText}>Skoda Fabia - 63349501</Text>
+                                    style={styles.optionText}>{car.carName} - {car.carNumber}</Text>
                                 <Icon name="chevron-right" size={24} />
                             </View>
                         </TouchableOpacity>

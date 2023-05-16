@@ -11,12 +11,12 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 
-export default function AddParking({ navigation, route }) {
+export default function MyParking({ navigation, route }) {
     const [useMyLocation, setUseMyLocation] = useState(false)
-    const [titleInput, setTitleInput] = useState('')
-    const [instructionInput, setInstructionsInput] = useState('')
-    const [locationInput, setLocationInput] = useState('')
-    const [parkingImage, setParkingImage] = useState(null);
+    const [titleInput, setTitleInput] = useState(route.params.title)
+    const [instructionInput, setInstructionsInput] = useState(route.params.instructions)
+    const [locationInput, setLocationInput] = useState(route.params.location)
+    const [parkingImage, setParkingImage] = useState(route.params.imageUrl);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -106,12 +106,14 @@ export default function AddParking({ navigation, route }) {
                 placeholder="Parking Title"
                 variant="outlined"
                 style={styles.textInput}
+                value={titleInput}
                 onChangeText={(newText) => setTitleInput(newText)}
             />
             <TextInput
                 placeholder="Parking Instructions"
                 variant="outlined"
                 style={styles.textInput}
+                value={instructionInput}
                 onChangeText={(newText) => setInstructionsInput(newText)}
             />
             <TextInput
@@ -119,10 +121,11 @@ export default function AddParking({ navigation, route }) {
                 variant={!useMyLocation ? "outlined" : 'filled'}
                 editable={!useMyLocation}
                 style={styles.textInput}
+                value={locationInput}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
             <CheckBox onPress={() => onCheckBoxPress()} checked={useMyLocation} title="Would you like to use your current location?" />
-            <Button title="Create Parking" color="blue" onPress={onCreateParking} />
+            <Button title="Edit Parking" color="blue" onPress={onCreateParking} />
         </View>
     );
 };
@@ -154,7 +157,7 @@ const styles = StyleSheet.create({
     statsLabel: {
         fontSize: 14,
         color: '#999999',
-        marginTop: 15
+        marginTop: 10
     },
     body: {
         alignItems: 'center',

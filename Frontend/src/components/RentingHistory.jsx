@@ -36,7 +36,7 @@ export default function RentingHistory({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <View style={styles.statsContainer}>
                         <View style={styles.statsBox}>
-                            <Text style={styles.statsLabel}>You can add and edit your vehicles here!</Text>
+                            <Text style={styles.statsLabel}>You can add and edit your cars here!</Text>
                         </View>
                         <Button title="Add Car" color='blue' style={styles.addBtn} />
                     </View>

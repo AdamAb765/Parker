@@ -112,10 +112,10 @@ export default function Profile({ navigation, route }) {
                         <Icon name="chevron-right" size={24} />
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('My Vehicles')}>
+                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('My Cars')}>
                     <View style={styles.optionBody}>
                         <Text adjustsFontSizeToFit
-                            style={styles.optionText}>My Vehicles</Text>
+                            style={styles.optionText}>My Cars</Text>
                         <Icon name="chevron-right" size={24} />
                     </View>
                 </TouchableOpacity>
