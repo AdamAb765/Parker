@@ -1,142 +1,121 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Callout } from 'react-native-maps';
 import { Marker } from 'react-native-maps';
-import { StyleSheet, Image, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
 import { CheckBox } from '@rneui/themed'
 import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'expo-image';
 
 export default function AddCar({ navigation, route }) {
-    const [useMyLocation, setUseMyLocation] = useState(false)
-    const [titleInput, setTitleInput] = useState('')
-    const [descriptionInput, setDescriptionInput] = useState('')
-    const [locationInput, setLocationInput] = useState('')
+    const [carName, setCarName] = useState('')
+    const [carColor, setColor] = useState('')
+    const [carNumber, setCarNumber] = useState('')
+    const [carImage, setCarImage] = useState(null);
 
-    useEffect(() => {
-        console.log(navigation)
-    }, [navigation.isFocused])
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
 
-    const onCheckBoxPress = () => {
-        setUseMyLocation(!useMyLocation)
-    }
-
-    const getMyLocation = async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-            return;
+        if (!result.canceled) {
+            setCarImage(result.assets[0].uri)
         }
+    };
 
-        let location = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-            enableHighAccuracy: true,
-            timeInterval: 5
-        })
-
-        return location
-    }
-
-    const getGeoLocationFromInput = async () => {
-        const searchInputResult = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?&address=${locationInput}&key=AIzaSyCZ-6i7NFhGDzMJl1546n-2EI0laWUc2Hc`)
-        const firstSearchResult = searchInputResult.data.results[0]
-
-        let locationToReturn = null
-
-        if (firstSearchResult && firstSearchResult.geometry) {
-            locationToReturn = {
-                coords: {
-                    latitude: firstSearchResult.geometry.location.lat,
-                    longitude: firstSearchResult.geometry.location.lng,
-                }
-            }
-        }
-
-        return locationToReturn
-    }
-
-    const onCreateParking = async () => {
-        if (titleInput && descriptionInput) {
-            let currentLocation
-
-            if (useMyLocation) {
-                currentLocation = await getMyLocation()
-            } else if (locationInput) {
-                currentLocation = await getGeoLocationFromInput()
-            }
-
-            if (currentLocation && currentLocation.coords) {
-                Alert.alert('Success!', 'Parking added successfully')
-            } else {
-                Alert.alert('Failed!', `Either this parking spot doesnt exist, or youre not using own location. Please try again`)
-            }
+    const onAddCar = () => {
+        if (carName && carImage && carNumber && carColor) {
+            Alert.alert('Success!', 'Car added successfully')
+            //try add to db
+            navigation.goBack()
         } else {
-            Alert.alert('Failed!', 'Please enter all details')
+            Alert.alert('Failed!', 'Please enter all details, including car picture')
         }
     }
+
     return (
         <View style={styles.container}>
-
-            <View
-                style={{
-                    borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                }}
-            />
-
+            <View style={styles.header}>
+                <View style={styles.headerContent}>
+                    <TouchableOpacity onPress={pickImage}>
+                        <Image style={styles.avatar}
+                            source={carImage}
+                            contentFit='contain'
+                            placeholder={require("../../assets/listing_vehicle_placeholder.jpg")} />
+                    </TouchableOpacity>
+                    <Text style={styles.statsLabel}>Press the car to add a picture!</Text>
+                </View>
+            </View>
             <TextInput
-                placeholder="Parking Title"
+                placeholder="Car Number"
                 variant="outlined"
                 style={styles.textInput}
-                onChangeText={(newText) => setTitleInput(newText)}
+                onChangeText={(newText) => setCarNumber(newText)}
             />
             <TextInput
-                placeholder="Parking Description"
+                placeholder="Car Name (e.g. Skoda Fabia)"
                 variant="outlined"
                 style={styles.textInput}
-                onChangeText={(newText) => setDescriptionInput(newText)}
+                onChangeText={(newText) => setCarName(newText)}
             />
             <TextInput
-                placeholder="Parking Location"
-                variant={!useMyLocation ? "outlined" : 'filled'}
-                editable={!useMyLocation}
+                placeholder="Car Color"
+                variant="outlined"
                 style={styles.textInput}
-                onChangeText={(newText) => setLocationInput(newText)}
+                onChangeText={(newText) => setColor(newText)}
             />
-
-            <CheckBox onPress={() => onCheckBoxPress()} checked={useMyLocation} title="Would you like to use your current location?" />
-
-            <Button title="Create Parking" color="blue" onPress={onCreateParking} />
+            <Button title="Add Car" color="blue" onPress={onAddCar} />
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        width: '100%'
+        justifyContent: 'space-evenly',
+        alignContent: 'center',
+        alignItems: 'center'
     },
     header: {
-        fontWeight: 'bold',
-        fontSize: 25,
-        marginBottom: 15,
+        height: '45%',
+        width: '100%'
     },
-    parkingImage: {
-        resizeMode: 'cover',
-        width: '60%',
-        height: '60%'
+    headerContent: {
+        alignItems: 'center',
     },
-    textStyle: {
-        marginBottom: 5
+    avatar: {
+        width: 370,
+        height: 220,
+        marginTop: 10
+    },
+    name: {
+        fontSize: 22,
+        color: '#000000',
+        fontWeight: '600',
+    },
+    statsLabel: {
+        fontSize: 14,
+        color: '#999999',
+        marginTop: 15
+    },
+    body: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        height: '60%',
+        width: '100%'
     },
     textInput: {
         width: '70%',
         height: '10%',
         marginBottom: 5,
-    }
-});
+    },
+})

@@ -1,23 +1,35 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Callout } from 'react-native-maps';
 import { Marker } from 'react-native-maps';
-import { StyleSheet, Image, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
 import { CheckBox } from '@rneui/themed'
 import axios from 'axios';
+import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'expo-image';
 
 export default function AddParking({ navigation, route }) {
     const [useMyLocation, setUseMyLocation] = useState(false)
     const [titleInput, setTitleInput] = useState('')
     const [descriptionInput, setDescriptionInput] = useState('')
     const [locationInput, setLocationInput] = useState('')
+    const [parkingImage, setParkingImage] = useState(null);
 
-    useEffect(() => {
-        console.log(navigation)
-    }, [navigation.isFocused])
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setParkingImage(result.assets[0].uri)
+        }
+    };
 
     const onCheckBoxPress = () => {
         setUseMyLocation(!useMyLocation)
@@ -67,6 +79,7 @@ export default function AddParking({ navigation, route }) {
             }
 
             if (currentLocation && currentLocation.coords) {
+                //try add parking
                 Alert.alert('Success!', 'Parking added successfully')
             } else {
                 Alert.alert('Failed!', `Either this parking spot doesnt exist, or youre not using own location. Please try again`)
@@ -75,16 +88,20 @@ export default function AddParking({ navigation, route }) {
             Alert.alert('Failed!', 'Please enter all details')
         }
     }
+
     return (
         <View style={styles.container}>
-
-            <View
-                style={{
-                    borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                }}
-            />
-
+            <View style={styles.header}>
+                <View style={styles.headerContent}>
+                    <TouchableOpacity onPress={pickImage}>
+                        <Image style={styles.avatar}
+                            contentFit='contain'
+                            source={parkingImage}
+                            placeholder={require("../../assets/listing_parking_placeholder.png")} />
+                    </TouchableOpacity>
+                    <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
+                </View>
+            </View>
             <TextInput
                 placeholder="Parking Title"
                 variant="outlined"
@@ -104,39 +121,118 @@ export default function AddParking({ navigation, route }) {
                 style={styles.textInput}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
-
             <CheckBox onPress={() => onCheckBoxPress()} checked={useMyLocation} title="Would you like to use your current location?" />
-
             <Button title="Create Parking" color="blue" onPress={onCreateParking} />
         </View>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        width: '100%'
+        justifyContent: 'space-evenly',
+        alignContent: 'center',
+        alignItems: 'center'
     },
     header: {
-        fontWeight: 'bold',
-        fontSize: 25,
-        marginBottom: 15,
+        height: '47.5%',
+        width: '100%'
     },
-    parkingImage: {
-        resizeMode: 'cover',
-        width: '60%',
-        height: '60%'
+    headerContent: {
+        alignItems: 'center',
     },
-    textStyle: {
-        marginBottom: 5
+    avatar: {
+        width: 370,
+        height: 240,
+        marginTop: 10
+    },
+    name: {
+        fontSize: 22,
+        color: '#000000',
+        fontWeight: '600',
+    },
+    statsLabel: {
+        fontSize: 14,
+        color: '#999999',
+        marginTop: 15
+    },
+    body: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        height: '60%',
+        width: '100%'
     },
     textInput: {
         width: '70%',
         height: '10%',
         marginBottom: 5,
-    }
-});
+    },
+})
+
+//     return (
+//         <View style={styles.container}>
+
+//             <View
+//                 style={{
+//                     borderBottomColor: 'black',
+//                     borderBottomWidth: StyleSheet.hairlineWidth,
+//                 }}
+//             />
+
+//             <TextInput
+//                 placeholder="Parking Title"
+//                 variant="outlined"
+//                 style={styles.textInput}
+//                 onChangeText={(newText) => setTitleInput(newText)}
+//             />
+//             <TextInput
+//                 placeholder="Parking Description"
+//                 variant="outlined"
+//                 style={styles.textInput}
+//                 onChangeText={(newText) => setDescriptionInput(newText)}
+//             />
+//             <TextInput
+//                 placeholder="Parking Location"
+//                 variant={!useMyLocation ? "outlined" : 'filled'}
+//                 editable={!useMyLocation}
+//                 style={styles.textInput}
+//                 onChangeText={(newText) => setLocationInput(newText)}
+//             />
+
+//             <CheckBox onPress={() => onCheckBoxPress()} checked={useMyLocation} title="Would you like to use your current location?" />
+
+//             <Button title="Create Parking" color="blue" onPress={onCreateParking} />
+//         </View>
+//     );
+// }
+
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         backgroundColor: '#fff',
+//         alignItems: 'center',
+//         justifyContent: 'center',
+//         height: '100%',
+//         width: '100%'
+//     },
+//     header: {
+//         fontWeight: 'bold',
+//         fontSize: 25,
+//         marginBottom: 15,
+//     },
+//     parkingImage: {
+//         resizeMode: 'cover',
+//         width: '60%',
+//         height: '60%'
+//     },
+//     textStyle: {
+//         marginBottom: 5
+//     },
+//     textInput: {
+//         width: '70%',
+//         height: '10%',
+//         marginBottom: 5,
+//     }
+// });
