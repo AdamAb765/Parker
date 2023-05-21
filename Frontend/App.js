@@ -14,14 +14,11 @@ import MyCars from './src/components/MyCars';
 import MyParkingSpots from './src/components/MyParkingSpots';
 import RentingHistory from './src/components/RentingHistory';
 import AddCar from './src/components/AddCar';
-<<<<<<< HEAD
 import MyCar from './src/components/MyCar';
 import MyParking from './src/components/MyParking';
-=======
 import LoginStackScreen from './src/screens/LoginStackScreen';
 
 import { auth } from './firebase';
->>>>>>> 6b62ce512f6020f73907284cdb165ed0ebcb8171
 
 function HomeScreen({ navigation }) {
   return (
