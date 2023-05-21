@@ -11,17 +11,10 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 
-export default function Parking({ navigation, route }) {
-    const onRentParking = async () => {
-        let rentParking = true
+export default function RentingHistoryRent({ navigation, route }) {
 
-        //try rent parking
-
-        if (rentParking) {
-            Alert.alert('Success!', 'Parking rented successfully')
-        } else {
-            Alert.alert('Failed!', `Couldnt red parking. Please try again`)
-        }
+    const calcMoneyMade = () => {
+        return ((Math.abs(route.params.endTime - route.params.startTime) / 36e5) * route.params.price).toFixed(2)
     }
 
     return (
@@ -40,33 +33,28 @@ export default function Parking({ navigation, route }) {
                 label='Parking Title'
                 style={styles.textInput}
                 value={route.params.title}
-                onChangeText={(newText) => setTitleInput(newText)}
+            />
+            <TextInput
+                variant={'outlined'}
+                editable={false}
+                label='Start Time'
+                style={styles.textInput}
+                value={route.params.startTime.toLocaleString()}
             />
             <TextInput
                 variant={'outlined'}
                 editable={false}
                 style={styles.textInput}
-                label='Parking Instructions'
-                value={route.params.instructions}
-                onChangeText={(newText) => setInstructionsInput(newText)}
+                label='End Time'
+                value={route.params.endTime.toLocaleString()}
             />
             <TextInput
                 variant={'outlined'}
                 editable={false}
                 style={styles.textInput}
-                label='Parking Location'
-                value={route.params.location}
-                onChangeText={(newText) => setLocationInput(newText)}
+                label='Money Paid'
+                value={calcMoneyMade() + ' ILS'}
             />
-            <TextInput
-                variant={'outlined'}
-                editable={false}
-                style={styles.textInput}
-                label='Parking Price'
-                value={route.params.price + ' ILS Per Hour'}
-                onChangeText={(newText) => setLocationInput(newText)}
-            />
-            <Button title="Rent Parking" color="blue" onPress={onRentParking} />
         </View>
     );
 };

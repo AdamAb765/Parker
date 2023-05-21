@@ -18,6 +18,11 @@ export default function MyCars({ navigation, route }) {
             carName: 'Skoda Fabia',
             carColor: 'White',
             imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg"
+        }, {
+            carNumber: '987654321',
+            carName: 'Skoda Fabia',
+            carColor: 'White',
+            imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg"
         }])
         setIsRequestingCars(false)
     }, [])
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
     },
     body: {
         alignItems: 'center',
-        padding: 10,
+        padding: 15,
         flexDirection: 'column',
         flexWrap: 'wrap',
     },

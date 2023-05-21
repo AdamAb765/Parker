@@ -8,47 +8,71 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
 
 export default function RentingHistory({ navigation, route }) {
-    const [useMyLocation, setUseMyLocation] = useState(false)
-    const [titleInput, setTitleInput] = useState('')
-    const [descriptionInput, setDescriptionInput] = useState('')
-    const [locationInput, setLocationInput] = useState('')
+    const [isRequestingRents, setIsRequestingRents] = useState(true)
+    const [rents, setRents] = useState([]);
 
-    const [images, setImages] = useState([
-        'https://www.bootdey.com/image/280x280/FF00FF/000000',
-        'https://www.bootdey.com/image/280x280/00FFFF/000000',
-        'https://www.bootdey.com/image/280x280/FF7F50/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/DC143C/000000',
-        'https://www.bootdey.com/image/280x280/FF00FF/000000',
-        'https://www.bootdey.com/image/280x280/00FFFF/000000',
-        'https://www.bootdey.com/image/280x280/FF7F50/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
-        'https://www.bootdey.com/image/280x280/6495ED/000000',
+    useEffect(() => {
+        //request rents
+        setRents([{
+            title: 'Parking in middle of Tel Aviv',
+            location: 'Rotschild 69 Tel Aviv',
+            renter: {
+                firstName: 'Adam',
+                lastName: 'Abraham',
+                contact: '0528535752'
+            },
+            price: '15',
+            instructions: 'Call when reached the parking',
+            imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170",
+            startTime: new Date(2023, 6, 23),
+            endTime: new Date(),
+        }, {
+            title: 'Parking in middle of Tel Aviv',
+            location: 'Rotschild 69 Tel Aviv',
+            renter: {
+                firstName: 'Adam',
+                lastName: 'Abraham',
+                contact: '0528535752'
+            },
+            price: '15',
+            instructions: 'Call when reached the parking',
+            imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170",
+            startTime: new Date(2023, 6, 23),
+            endTime: new Date(),
+        }])
+        setIsRequestingRents(false)
+    }, [])
 
-
-    ]);
-
+    const countTotalRentMoney = () => {
+        return rents.reduce((sum, rent) => {
+            return sum + parseFloat(((Math.abs(rent.endTime - rent.startTime) / 36e5) * rent.price).toFixed(2))
+        }, 0)
+    }
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.headerContent}>
-                    <View style={styles.statsContainer}>
+                <View style={styles.statsContainer}>
                         <View style={styles.statsBox}>
-                            <Text style={styles.statsLabel}>You can add and edit your cars here!</Text>
+                            <Text style={styles.statsLabel}>You can view this parking's history here!</Text>
                         </View>
-                        <Button title="Add Car" color='blue' style={styles.addBtn} />
+                        <View style={styles.statsBox}>
+                            <Text style={styles.moneyLabel}>Total money spent on parkings: {countTotalRentMoney()}</Text>
+                        </View>
+                        <View style={styles.statsBox}>
+                            <Text style={styles.statusLabel}>Current Status: {route.params ? 'Not Renting' : 'Renting'}!</Text>
+                        </View>
                     </View>
                 </View>
             </View>
             <View style={styles.carsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
-                    {images.map((image, index) => (
-                        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Rent History')}>
+                    {rents.map((rent, index) => (
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Renting History Rent', { ...rent })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
-                                    style={styles.optionText}>Skoda Fabia - 63349501</Text>
+                                    style={styles.optionText}>{rent.endTime.toLocaleDateString()} - {rent.title}</Text>
                                 <Icon name="chevron-right" size={24} />
                             </View>
                         </TouchableOpacity>
@@ -77,7 +101,7 @@ const styles = StyleSheet.create({
         marginTop: '2%'
     },
     optionBody: {
-        width: '80%',
+        width: '90%',
         color: '#999999',
         flexDirection: 'row',
         justifyContent: 'space-between'
@@ -114,9 +138,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#999999',
     },
+    moneyLabel: {
+        fontSize: 16,
+        color: 'rgba(0,0,0,0.7)',
+    },
+    statusLabel: {
+        fontSize: 16,
+        color: 'rgba(0,0,0,0.7)',
+    },
     body: {
         alignItems: 'center',
-        padding: 10,
+        padding: 15,
         flexDirection: 'column',
         flexWrap: 'wrap',
     },

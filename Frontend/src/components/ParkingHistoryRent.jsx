@@ -11,62 +11,42 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 
-export default function Parking({ navigation, route }) {
-    const onRentParking = async () => {
-        let rentParking = true
+export default function ParkingHistoryRent({ navigation, route }) {
 
-        //try rent parking
-
-        if (rentParking) {
-            Alert.alert('Success!', 'Parking rented successfully')
-        } else {
-            Alert.alert('Failed!', `Couldnt red parking. Please try again`)
-        }
+    const calcMoneyMade = () => {
+        return ((Math.abs(route.params.endTime - route.params.startTime) / 36e5) * route.params.price).toFixed(2)
     }
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.headerContent}>
-                    <Image style={styles.avatar}
-                        contentFit='contain'
-                        source={route.params.imageUrl}
-                        placeholder={require("../../assets/listing_parking_placeholder.png")} />
-                </View>
-            </View>
             <TextInput
                 variant={'outlined'}
                 editable={false}
-                label='Parking Title'
+                label='Start Time'
                 style={styles.textInput}
-                value={route.params.title}
-                onChangeText={(newText) => setTitleInput(newText)}
+                value={route.params.startTime.toLocaleString()}
             />
             <TextInput
                 variant={'outlined'}
                 editable={false}
                 style={styles.textInput}
-                label='Parking Instructions'
-                value={route.params.instructions}
-                onChangeText={(newText) => setInstructionsInput(newText)}
+                label='End Time'
+                value={route.params.endTime.toLocaleString()}
             />
             <TextInput
                 variant={'outlined'}
                 editable={false}
                 style={styles.textInput}
-                label='Parking Location'
-                value={route.params.location}
-                onChangeText={(newText) => setLocationInput(newText)}
+                label='Renter'
+                value={`${route.params.renter.firstName} ${route.params.renter.lastName}`}
             />
             <TextInput
                 variant={'outlined'}
                 editable={false}
                 style={styles.textInput}
-                label='Parking Price'
-                value={route.params.price + ' ILS Per Hour'}
-                onChangeText={(newText) => setLocationInput(newText)}
+                label='Money Made'
+                value={calcMoneyMade() + ' ILS'}
             />
-            <Button title="Rent Parking" color="blue" onPress={onRentParking} />
         </View>
     );
 };

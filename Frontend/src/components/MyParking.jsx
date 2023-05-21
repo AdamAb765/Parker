@@ -125,7 +125,10 @@ export default function MyParking({ navigation, route }) {
                 onChangeText={(newText) => setLocationInput(newText)}
             />
             <CheckBox onPress={() => onCheckBoxPress()} checked={useMyLocation} title="Would you like to use your current location?" />
-            <Button title="Edit Parking" color="blue" onPress={onCreateParking} />
+            <View style={styles.control}>
+            <Button style={styles.editBtn} title="Edit Parking" color="blue" onPress={onCreateParking} />
+            <Button style={styles.historyBtn} title="Parking History" color="green" onPress={() => navigation.navigate("Parking History List", {...route.params})} />
+            </View>
         </View>
     );
 };
@@ -172,4 +175,15 @@ const styles = StyleSheet.create({
         height: '10%',
         marginBottom: 5,
     },
+    control: {
+        width: '90%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    editBtn: {
+        width: '42%',
+    },
+    historyBtn: {
+        width: '50%'
+    }
 })

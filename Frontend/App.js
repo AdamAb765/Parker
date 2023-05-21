@@ -19,6 +19,9 @@ import MyParking from './src/components/MyParking';
 import LoginStackScreen from './src/screens/LoginStackScreen';
 
 import { auth } from './firebase';
+import ParkingHistoryList from './src/components/ParkingHistoryList';
+import ParkingHistoryRent from './src/components/ParkingHistoryRent';
+import RentingHistoryRent from './src/components/RentingHistoryRent';
 
 function HomeScreen({ navigation }) {
   return (
@@ -100,6 +103,18 @@ export default function App() {
         <ProfileStack.Screen
           name="Car"
           component={MyCar}
+        />
+        <ProfileStack.Screen
+          name="Parking History List"
+          component={ParkingHistoryList}
+        />
+        <ProfileStack.Screen
+          name="Parking History Rent"
+          component={ParkingHistoryRent}
+        />
+        <ProfileStack.Screen
+          name="Renting History Rent"
+          component={RentingHistoryRent}
         />
       </ProfileStack.Navigator>
     )
