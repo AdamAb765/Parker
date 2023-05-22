@@ -18,8 +18,8 @@ export default function LoginScreen({ navigation }) {
         if (emailInput && passwordInput) {
             await signInWithEmailAndPassword(auth, emailInput, passwordInput)
             .then(async (userCredential) => {
-                const userInfo = await axios.get(`http://10.100.102.29:3000/user/byEmail/${emailInput}`)
-                await AsyncStorage.setItem('@user', JSON.stringify(userInfo))
+                const userInfo = await axios.get(`http://10.100.102.29:3000/users/byEmail/${emailInput}`)
+                await AsyncStorage.setItem('@user', JSON.stringify(userInfo.data))
                                         
                 console.log(`${userCredential.user.displayName} is logged in!`);
             })

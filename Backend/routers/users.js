@@ -14,9 +14,9 @@ app.get("/:id", async (req, res, next) => {
   res.json(user);
 });
 
-app.get("byEmail/:email", async (req, res, next) => {
+app.get("/byEmail/:email", async (req, res) => {
   const email = req.params.email;
-  const filter = { email: email };
+  const filter = { mail: email };
   const user = await User.findOne(filter);
   res.json(user);
 });
