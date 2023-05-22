@@ -2,17 +2,21 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Image, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
-import axios from 'axios';
+import { get } from 'axios';
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MyCars({ navigation, route }) {
     const [isRequestingCars, setIsRequestingCars] = useState(true)
     const [cars, setCars] = useState([]);
 
-    useEffect(() => {
+    useEffect(async () => {
         //request cars
+        const userInfo = JSON.parse(await AsyncStorage.getItem('@userInfo'));
+        const vehicles = get("http://10.100.102.26/vehicles/vehicleByOwner/" + userInfo.id);
+        console.log(vehicles);
         setCars([{
             carNumber: '12345678',
             carName: 'Skoda Fabia',

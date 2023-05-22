@@ -14,6 +14,13 @@ app.get("/:id", async (req, res, next) => {
   res.json(user);
 });
 
+app.get("byEmail/:email", async (req, res, next) => {
+  const email = req.params.email;
+  const filter = { email: email };
+  const user = await User.findOne(filter);
+  res.json(user);
+});
+
 app.post("/create", (req, res) => {
   console.log(req.body);
   const { user } = req.body;

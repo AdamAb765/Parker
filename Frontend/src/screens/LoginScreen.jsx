@@ -3,6 +3,8 @@ import { Stack, TextInput, Button, IconButton } from "@react-native-material/cor
 import { StyleSheet, Text, View, Alert, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from "firebase/auth";
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useTogglePasswordVisibility } from '../hooks/useTogglePasswordVisibility';
 import { auth } from '../../firebase';
@@ -15,7 +17,10 @@ export default function LoginScreen({ navigation }) {
     const onLoginSubmit = async () => {
         if (emailInput && passwordInput) {
             await signInWithEmailAndPassword(auth, emailInput, passwordInput)
-            .then((userCredential) => { 
+            .then(async (userCredential) => {
+                const userInfo = await axios.get(`http://10.100.102.29:3000/user/byEmail/${emailInput}`)
+                await AsyncStorage.setItem('@user', JSON.stringify(userInfo))
+                                        
                 console.log(`${userCredential.user.displayName} is logged in!`);
             })
             .catch((error) => {
