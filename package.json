@@ -25,6 +25,7 @@
     "mongodb": "^5.5.0",
     "mongoose": "^7.1.1",
     "node-fetch": "^2.6.9",
+    "react-native-async-storage": "^0.0.1",
     "uuidv4": "^6.2.13"
   }
 }
