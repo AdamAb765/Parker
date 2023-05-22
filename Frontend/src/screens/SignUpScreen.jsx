@@ -4,26 +4,39 @@ import { StyleSheet, Text, View, Alert, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from '../../firebase';
+import axios from 'axios';
 
 import { useTogglePasswordVisibility } from '../hooks/useTogglePasswordVisibility';
 
 export default function SignUpScreen({ navigation }) {
+    const [id, setId] = useState('');
     const [emailInput, setEmailInput] = useState('');
-    const [nameInput, setNameInput] = useState('');
+    const [firstNameInput, setFirstNameInput] = useState('');
+    const [lastNameInput, setLastNameInput] = useState('');
     const [passwordInput, setPasswordInput] = useState('');
     const [secondPasswordInput, setSecondPasswordInput] = useState('');
+    const [contactNumber, setContactNumber] = useState('')
 
     const firstPasswordToggle = useTogglePasswordVisibility();
     const secondPasswordToggle = useTogglePasswordVisibility();
     const onSignUpSubmit = async () => {
-
-        if (nameInput && emailInput && passwordInput && secondPasswordInput) {
+        if (firstNameInput && lastNameInput && emailInput && 
+            passwordInput && secondPasswordInput && id && contactNumber) {
             if (passwordInput != secondPasswordInput) {
                 Alert.alert('Failed!', 'Your passwords are not the same!');
             } else {
                 await createUserWithEmailAndPassword(auth, emailInput, passwordInput)
                 .then(async (userCredential) => {
-                    console.log("User signed up!");
+                    const userToAdd = {
+                        id: id,
+                        firstName: firstNameInput,
+                        lastName: lastNameInput,
+                        mail: emailInput,
+                        password: passwordInput,
+                        phone: contactNumber
+                    }
+                    console.log(userToAdd)
+                    await axios.post('http://10.100.102.6:3000/users/create', userToAdd)
                 })
                 .catch((error) => {
                     Alert.alert('Failed!', `${error.message}`);
@@ -32,7 +45,7 @@ export default function SignUpScreen({ navigation }) {
                 await auth.onAuthStateChanged(async (user) => {
                     if (user) {
                         await updateProfile(user, {
-                            displayName: nameInput,
+                            displayName: firstNameInput,
                         }).then(() => {
                             navigation.navigate('Login');
                         }).catch((error) => {
@@ -56,11 +69,25 @@ export default function SignUpScreen({ navigation }) {
             resizeMode='contain'
         />
         <TextInput
-            placeholder="Name"
+            placeholder="ID"
             variant="outlined"
             color='#2194ED'
             style={styles.textInput}
-            onChangeText={(newText) => setNameInput(newText)}
+            onChangeText={(newText) => setId(newText)}
+        />
+        <TextInput
+            placeholder="First Name"
+            variant="outlined"
+            color='#2194ED'
+            style={styles.textInput}
+            onChangeText={(newText) => setFirstNameInput(newText)}
+        />
+        <TextInput
+            placeholder="Last Name"
+            variant="outlined"
+            color='#2194ED'
+            style={styles.textInput}
+            onChangeText={(newText) => setLastNameInput(newText)}
         />
         <TextInput
             placeholder="Email"
@@ -68,6 +95,13 @@ export default function SignUpScreen({ navigation }) {
             color='#2194ED'
             style={styles.textInput}
             onChangeText={(newText) => setEmailInput(newText)}
+        />
+        <TextInput
+            placeholder="Contact Number"
+            variant="outlined"
+            color='#2194ED'
+            style={styles.textInput}
+            onChangeText={(newText) => setContactNumber(newText)}
         />
         <TextInput
             placeholder="Password"
@@ -120,8 +154,8 @@ export default function SignUpScreen({ navigation }) {
   const styles = StyleSheet.create({
     logo: {
         maxHeight: '10%',
-        marginBottom: '20%',
-        marginTop: '10%'
+        marginBottom: '12%',
+        marginTop: '5%'
     },
     loginButton: {
         marginBottom: '3%'

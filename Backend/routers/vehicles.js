@@ -1,7 +1,6 @@
 const { Router } = require("express");
-const Vehicle = require('../models/Vehicle')
+const Vehicle = require("../models/Vehicle");
 const app = Router();
-
 
 app.get("/", async (req, res, next) => {
   const allVehicles = await Vehicle.find();
@@ -9,38 +8,36 @@ app.get("/", async (req, res, next) => {
 });
 
 app.get("/:serial", async (req, res, next) => {
-  const query = {'serial': req.params.serial};
+  const query = { serial: req.params.serial };
   const vehicle = await Vehicle.findOne(query);
   res.json(vehicle);
 });
 
 app.get("/vehicleByOwner/:ownerId", async (req, res, next) => {
-  const query = {'ownerId': req.params.ownerId};
-  const vehicle = await Vehicle.findOne(query);
+  const query = { ownerId: req.params.ownerId };
+  const vehicle = await Vehicle.find(query);
   res.json(vehicle);
 });
 
 app.post("/create", (req, res) => {
   const newVehicle = new Vehicle(req.body.vehicle);
   newVehicle
-      .save()
-      .then(() => {
-        res.send("Vehicle added successfully")
-      })
-      .catch(err => console.log(err));
+    .save()
+    .then(() => {
+      res.send("Vehicle added successfully");
+    })
+    .catch((err) => console.log(err));
 });
 
 app.put("/edit", async (req, res) => {
-  const {vehicle} = req.body;
+  const { vehicle } = req.body;
 
-  const query = {'serial': vehicle.serial};
+  const query = { serial: vehicle.serial };
   const doc = await Vehicle.findOneAndUpdate(query, vehicle, {
-    returnOriginal: false
+    returnOriginal: false,
   });
 
   res.json(doc);
-
 });
-
 
 module.exports = app;

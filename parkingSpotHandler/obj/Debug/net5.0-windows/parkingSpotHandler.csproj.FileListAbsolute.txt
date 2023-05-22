@@ -26,3 +26,31 @@ C:\projects\git-workspace\Parker-desktop\parkingSpotHandler\bin\Debug\net5.0-win
 C:\projects\git-workspace\Parker-desktop\parkingSpotHandler\bin\Debug\net5.0-windows\AForge.Video.dll
 C:\projects\git-workspace\Parker-desktop\parkingSpotHandler\bin\Debug\net5.0-windows\AForge.Video.DirectShow.dll
 C:\projects\git-workspace\Parker-desktop\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.csproj.CopyComplete
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\parkingSpotHandler.exe
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\parkingSpotHandler.deps.json
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\parkingSpotHandler.runtimeconfig.json
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\parkingSpotHandler.runtimeconfig.dev.json
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\parkingSpotHandler.dll
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\ref\parkingSpotHandler.dll
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\parkingSpotHandler.pdb
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\AForge.dll
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\AForge.Video.dll
+D:\studies\Final Project\Parker\parkingSpotHandler\bin\Debug\net5.0-windows\AForge.Video.DirectShow.dll
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.csproj.AssemblyReference.cache
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\HomePage.g.cs
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\MainWindow.g.cs
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\App.g.cs
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler_MarkupCompile.cache
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler_MarkupCompile.lref
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\HomePage.baml
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\MainWindow.baml
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.g.resources
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.GeneratedMSBuildEditorConfig.editorconfig
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.AssemblyInfoInputs.cache
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.AssemblyInfo.cs
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.csproj.CoreCompileInputs.cache
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.csproj.CopyComplete
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.dll
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\ref\parkingSpotHandler.dll
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.pdb
+D:\studies\Final Project\Parker\parkingSpotHandler\obj\Debug\net5.0-windows\parkingSpotHandler.genruntimeconfig.cache
