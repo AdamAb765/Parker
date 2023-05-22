@@ -32,17 +32,16 @@ app.get("/isAvailable/:id", async (req, res, next) => {
     return res.status(404).send("Cant find a shit");
   }
   const cameraUrl = "http://" + park.cameraIpAddress + ":" +
-  park.cameraPort + "/captureParking/" + park.cameraName;
-  console.log(cameraUrl);
+    park.cameraPort + "/captureParking/" + park.cameraName;
   await get(cameraUrl)
-    .then(res => {
-      results = res.data.results;
-      if(Array.isArray(results) && results.length) {
-        return res.status(200).send(false);
+    .then(ans => {
+      console.log(ans.data.results);
+      if (Array.isArray(ans.data.results) && ans.data.results.length) {
+        res.status(200).send(false);
       } else {
-        return res.status(200).send(true);
+        res.status(200).send(true);
       }
-      
+
     })
     .catch(err => {
       console.log(err);
