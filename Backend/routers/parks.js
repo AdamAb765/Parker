@@ -1,28 +1,49 @@
 const { Router } = require("express");
+const Park = require("../models/Park");
+
 const app = Router();
 
-app.get("/parks", (req, res, next) => {
-  res.json([
-    {
-      Address: "Tel-Aviv, Eben Gaviroll",
-      Contact: "0522515944",
-      Price: "22.5",
-    },
-    { Address: "Bnei-Barak, Heletz", Contact: "0522515944", Price: "12.5" },
-    { Address: "Tel-Aviv, HaMasger", Contact: "0522515944", Price: "21" },
-    { Address: "Tel-Aviv, Savidor", Contact: "0522515944", Price: "14.5" },
-    { Address: "Glilot, military camp", Contact: "0522515944", Price: "10.5" },
-  ]);
+app.get("/", async (req, res, next) => {
+  const allParks = await Park.find();
+  res.json(allParks);
 });
 
-app.post("/RegisterPark", (req, res) => {
-  console.log(req.body);
-  res.send("POST request to register a park");
+app.get("/:id", async (req, res, next) => {
+  const park = await Park.findById(req.params.id);
+  if (!park) {
+    return res.status(404).send("Cant find a shit");
+  }
+  res.json(park);
 });
 
-app.post("/DocumentPark", (req, res) => {
-  console.log("Client params:" + req.body);
-  res.send("POST request to document a park that has been finisehd");
+app.get("/parkByOwner/:ownerId", async (req, res, next) => {
+  const query = { ownerId: req.params.ownerId };
+  const park = await Park.findOne(query);
+  if (!park) {
+    return res.status(404).send("Cant find a shit");
+  }
+  res.json(park);
+});
+
+app.post("/create", (req, res) => {
+  const newPark = new Park(req.body.park);
+  newPark
+    .save()
+    .then(() => {
+      console.log("Successfully added park!");
+      res.send("Added successfully");
+    })
+    .catch((err) => console.log(err));
+});
+
+app.put("/edit", async (req, res) => {
+  const { park} = req.body;
+  const query = { _id: park._id };
+  const doc = await Park.findOneAndUpdate(query, park, {
+    returnOriginal: false,
+  });
+
+  res.json(doc);
 });
 
 module.exports = app;

@@ -4,6 +4,7 @@
   "description": "parker",
   "main": "app.js",
   "scripts": {
+    "dev": "DEBUG=app:* nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +21,8 @@
     "express": "^4.18.2",
     "fluent-ffmpeg": "^2.1.2",
     "form-data": "^4.0.0",
+    "mongodb": "^5.5.0",
+    "mongoose": "^7.1.1",
     "node-fetch": "^2.6.9",
     "uuidv4": "^6.2.13"
   }
