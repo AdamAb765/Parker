@@ -7,7 +7,10 @@ const ParkSchema = new mongoose.Schema({
     description: String,
     image: String,
     address: String,
-    isAvailable: Boolean
+    isAvailable: Boolean,
+    cameraName: String,
+    cameraPort: Number,
+    cameraIpAddress: String
 });
 
 module.exports = new mongoose.model("Park", ParkSchema);
