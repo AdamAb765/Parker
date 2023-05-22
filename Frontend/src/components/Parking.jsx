@@ -1,27 +1,59 @@
 import React, { useEffect, useRef, useState } from 'react';
-import MapView, { Callout } from 'react-native-maps';
-import { Marker } from 'react-native-maps';
 import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
-import { CheckBox } from '@rneui/themed'
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Parking({ navigation, route }) {
+    const [parkingInfo, setParkingInfo] = useState({})
+    const [isUserRenting, setIsUserRenting] = useState(false)
+
+    useEffect(() => {
+        getParkingInfo()
+    }, [])
+
+    const getParkingInfo = async () => {
+        const userInfo = JSON.parse(await AsyncStorage.getItem('@userInfo'))
+        const parkingInfo = await axios.get(`http://10.100.102.29:3000/parks/${route.params._id}`)
+        const isRentingParking = await axios.get(`http://10.100.102.29:3000/orders/byParkAndConsumer/${route.params._id}/${userInfo._id}`)
+
+        setIsUserRenting(isRentingParking)
+        setParkingInfo(parkingInfo)
+    }
+
+    const isTimeAllowed = () => {
+
+    }
+
+    const endRentParking = async () => {
+
+    }
+
     const onRentParking = async () => {
-        let rentParking = true
+        const userInfo = JSON.parse(await AsyncStorage.getItem('@userInfo'))
 
-        //try rent parking
-
-        if (rentParking) {
-            Alert.alert('Success!', 'Parking rented successfully')
-        } else {
-            Alert.alert('Failed!', `Couldnt red parking. Please try again`)
+        const newOrder = {
+            parkId: route.params._id,
+            consumerId: userInfo._Id,
+            vehicleSerial: 123123123,
+            timeStart: new Date(),
+            payment: 0
         }
+
+        axios.post(`http://10.100.102.29:3000/orders/create`, newOrder)
+        .then(res => {
+            if(res.status == 200) {
+                Alert.alert('Success!', 'Parking rented successfully')
+                navigation.goBack(null)
+            } else {
+                Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
+            }
+        })
     }
 
     return (
@@ -66,7 +98,12 @@ export default function Parking({ navigation, route }) {
                 value={route.params.price + ' ILS Per Hour'}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
-            <Button title="Rent Parking" color="blue" onPress={onRentParking} />
+            {isUserRenting ? <Button title="End Parking" color="red" onPress={endRentParking} /> : null}
+            {!isUserRenting && parkingInfo.isAvailable ?
+                <Button title="Rent Parking" color="blue" onPress={onRentParking} />
+                :
+                <Text>Parking is currently occupied or unusuable!</Text>}
+
         </View>
     );
 };
