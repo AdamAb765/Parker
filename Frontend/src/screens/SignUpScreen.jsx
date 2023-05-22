@@ -35,7 +35,6 @@ export default function SignUpScreen({ navigation }) {
                         password: passwordInput,
                         phone: contactNumber
                     }
-                    console.log(userToAdd)
                     await axios.post('http://10.100.102.6:3000/users/create', userToAdd)
                 })
                 .catch((error) => {

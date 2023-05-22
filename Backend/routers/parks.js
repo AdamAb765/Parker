@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const { get } = require("axios");
 const Park = require("../models/Park");
 
 const app = Router();
@@ -25,6 +26,29 @@ app.get("/parkByOwner/:ownerId", async (req, res, next) => {
   res.json(park);
 });
 
+app.get("/isAvailable/:id", async (req, res, next) => {
+  const park = await Park.findById(req.params.id);
+  if (!park) {
+    return res.status(404).send("Cant find a shit");
+  }
+  const cameraUrl = "http://" + park.cameraIpAddress + ":" +
+  park.cameraPort + "/captureParking/" + park.cameraName;
+  console.log(cameraUrl);
+  await get(cameraUrl)
+    .then(res => {
+      results = res.data.results;
+      if(Array.isArray(results) && results.length) {
+        return res.status(200).send(false);
+      } else {
+        return res.status(200).send(true);
+      }
+      
+    })
+    .catch(err => {
+      console.log(err);
+    })
+});
+
 app.post("/create", (req, res) => {
   const newPark = new Park(req.body.park);
   newPark
@@ -37,7 +61,7 @@ app.post("/create", (req, res) => {
 });
 
 app.put("/edit", async (req, res) => {
-  const { park} = req.body;
+  const { park } = req.body;
   const query = { _id: park._id };
   const doc = await Park.findOneAndUpdate(query, park, {
     returnOriginal: false,
@@ -45,5 +69,22 @@ app.put("/edit", async (req, res) => {
 
   res.json(doc);
 });
+
+app.put("/setCamera", async (req, res) => {
+  const query = { _id: req.body.parkId };
+  const camera = {
+    cameraName: req.body.cameraName,
+    cameraPort: req.body.cameraPort,
+    cameraIpAddress: req.body.cameraIpAddress
+  }
+  console.log(camera);
+  const doc = await Park.findOneAndUpdate(query, camera, {
+    returnOriginal: false,
+    multi: true
+  });
+
+  res.json(doc);
+});
+
 
 module.exports = app;
