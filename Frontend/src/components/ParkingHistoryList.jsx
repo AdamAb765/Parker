@@ -45,7 +45,7 @@ export default function ParkingHistoryList({ navigation, route }) {
 
     const countTotalRentMoney = () => {
         return rents.reduce((sum, rent) => {
-            return sum + ((Math.abs(rent.endTime - rent.startTime) / 36e5) * rent.price).toFixed(2)
+            return sum + parseFloat(((Math.abs(rent.endTime - rent.startTime) / 36e5) * rent.price).toFixed(2))
         }, 0)
     }
 
