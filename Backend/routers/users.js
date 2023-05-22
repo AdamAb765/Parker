@@ -26,6 +26,18 @@ app.post("/create", (req, res) => {
     .catch((err) => console.log(err));
 });
 
+app.post("/login", async (req, res) => {
+  console.log(req.body);
+  const { mail, password } = req.body;
+  const query = { mail: mail, password: password }
+  const user = await User.findOne(query);
+  if (!user) {
+    res.status(409).send("No such a user");
+  } else {
+    res.status(200).send(user);
+  }
+});
+
 app.put("/edit", async (req, res) => {
   console.log("update: " + req.body);
   const { user } = req.body;
