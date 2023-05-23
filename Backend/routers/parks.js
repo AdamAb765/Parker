@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { get } = require("axios");
 const Park = require("../models/Park");
+const { isParkingSpotAvalibale } = require("../common/prakingSpotsBL");
 
 const app = Router();
 
@@ -35,25 +36,12 @@ app.get("/isAvailable/:id", async (req, res, next) => {
   if (!park) {
     return res.json([]);
   }
-  const cameraUrl =
-    "http://" +
-    park.cameraIpAddress +
-    ":" +
-    park.cameraPort +
-    "/captureParking/" +
-    park.cameraName;
-  await get(cameraUrl)
-    .then((ans) => {
-      console.log(ans.data.results);
-      if (Array.isArray(ans.data.results) && ans.data.results.length) {
-        res.status(200).send(false);
-      } else {
-        res.status(200).send(true);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+
+  if (await isParkingSpotAvalibale(park)) {
+    res.status(200).send(true);
+  } else {
+    res.status(200).send(false);
+  }
 });
 
 app.post("/create", (req, res) => {
