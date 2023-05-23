@@ -64,8 +64,14 @@ namespace parkingSpotHandler
             capture.CameraName = CameraComboBox.SelectedItem.ToString();
             capture.ParkingId = (ParkingComboBox.SelectedItem as ParkingSpotModel).Id;
 
-            ServiceManager.UpdateParkingCamera(capture);
+            if (!ServiceManager.UpdateParkingCamera(capture))
+            {
+                txtError.Text = "Failed to connect camera to parking";
 
+                return;
+            }
+
+            txtError.Text = string.Empty;
             addCameraSection.Visibility = Visibility.Collapsed;
         }
     }

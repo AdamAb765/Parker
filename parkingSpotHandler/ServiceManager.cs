@@ -75,7 +75,7 @@ namespace parkingSpotHandler
             StartCapureServer();
         }
 
-        public static void UpdateParkingCamera(CaptureProcessModel captureProcess)
+        public static bool UpdateParkingCamera(CaptureProcessModel captureProcess)
         {
             string url = $"http://localhost:3000/parks/setCamera";
             string serializedCaptureProcess = JsonSerializer.Serialize(captureProcess);
@@ -87,16 +87,8 @@ namespace parkingSpotHandler
 
                 HttpResponseMessage response = httpClient.PutAsync(url, requestBody).Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseContent = response.Content.ReadAsStringAsync().Result;
-                }
-                else
-                {
-
-                }
+                return response.IsSuccessStatusCode;
             }
-            // TO DO : Update the mongo with the process detailes (ip port and camera name)
         }
 
         public static IEnumerable<ParkingSpotModel> GetUserParkingSpots(string userId)
