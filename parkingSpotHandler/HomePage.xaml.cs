@@ -19,15 +19,23 @@ namespace parkingSpotHandler
     /// </summary>
     public partial class HomePage : Window
     {
-        public HomePage()
+        private readonly string m_UserId;
+        private readonly ServiceManager m_ServiceManager;
+
+
+        public HomePage(string id)
         {
             InitializeComponent();
 
+            m_UserId = id;
+
+            m_ServiceManager = new ServiceManager(id);
+
             CameraComboBox.ItemsSource = ServiceManager.GetConnectedCameras().ToList();
-            ParkingComboBox.ItemsSource = ServiceManager.GetUserParkingSpots().ToList();
+            ParkingComboBox.ItemsSource = ServiceManager.GetUserParkingSpots(id).ToList();
 
             CameraComboBox.SelectedItem = CameraComboBox.Items[0];
-            ParkingComboBox.SelectedItem = ParkingComboBox.Items[2];
+            ParkingComboBox.SelectedItem = ParkingComboBox.Items[0];
         }
 
         private void RestartBtn_Click(object sender, RoutedEventArgs e)
@@ -50,12 +58,21 @@ namespace parkingSpotHandler
         {
             CaptureProcessModel capture = new CaptureProcessModel();
 
+            capture.ParkingId = m_UserId;
             capture.Ip = ServiceManager.GetMachineIp();
             capture.Port = ServiceManager.StartCapureServer();
             capture.CameraName = CameraComboBox.SelectedItem.ToString();
             capture.ParkingId = (ParkingComboBox.SelectedItem as ParkingSpotModel).Id;
 
-            ServiceManager.UpdateParkingCamera(capture);
+            if (!ServiceManager.UpdateParkingCamera(capture))
+            {
+                txtError.Text = "Failed to connect camera to parking";
+
+                return;
+            }
+
+            txtError.Text = string.Empty;
+            addCameraSection.Visibility = Visibility.Collapsed;
         }
     }
 }

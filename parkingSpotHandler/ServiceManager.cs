@@ -5,9 +5,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -16,7 +18,15 @@ namespace parkingSpotHandler
     public class ServiceManager
     {
         private const string RUNNING_PROCESS_ID_FILE = "RunningProcessId.txt"; 
-        private const int PORT_MIN = 1000;
+        private const int PORT_MIN = 42689;
+
+        private readonly string m_UserId;
+
+
+        public ServiceManager(string id)
+        {
+            m_UserId = id;
+        }
 
         public static IEnumerable<string> GetConnectedCameras()
         {
@@ -40,6 +50,7 @@ namespace parkingSpotHandler
 
             return myIP;
         }
+
         public static void OpenHistoryFolder()
         {
             string capturesPath = Path.Join(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"capture-handler\captures");
@@ -64,22 +75,32 @@ namespace parkingSpotHandler
             StartCapureServer();
         }
 
-        public static void UpdateParkingCamera(CaptureProcessModel captureProcess)
+        public static bool UpdateParkingCamera(CaptureProcessModel captureProcess)
         {
-            // TO DO : Update the mongo with the process detailes (ip port and camera name)
+            string url = $"http://localhost:3000/parks/setCamera";
+            string serializedCaptureProcess = JsonSerializer.Serialize(captureProcess);
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                HttpContent requestBody = new StringContent(serializedCaptureProcess, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = httpClient.PutAsync(url, requestBody).Result;
+
+                return response.IsSuccessStatusCode;
+            }
         }
 
-        public static IEnumerable<ParkingSpotModel> GetUserParkingSpots()
+        public static IEnumerable<ParkingSpotModel> GetUserParkingSpots(string userId)
         {
-            // TO DO: Load all that data from the mongo (route that return akk the parking spots of the user)
+            using (HttpClient httpClient = new HttpClient())
+            {
+                var response = httpClient.GetAsync("http://localhost:3000/parks/parkByOwner/" + userId).Result;
+                string responseContent = response.Content.ReadAsStringAsync().Result;
+                var parkingSpots = JsonSerializer.Deserialize<IEnumerable<ParkingSpotModel>>(responseContent);
 
-            return new List<ParkingSpotModel>() { 
-               new ParkingSpotModel() { Id = "1", Name="The bitcher", Address = "Harta bartat 5"},
-               new ParkingSpotModel() { Id = "2", Name="Kill bill", Address = "Harta bsdfsdfarsdfsdftat 5"},
-               new ParkingSpotModel() { Id = "4", Name="Close One", Address = "Moresher 3"},
-               new ParkingSpotModel() { Id = "5", Name="Lister bister", Address = "Ha bartat 5"},
-            };
-
+                return parkingSpots;
+            }
         }
 
         public static int StartCapureServer()
