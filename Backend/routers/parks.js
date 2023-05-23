@@ -10,20 +10,24 @@ app.get("/", async (req, res, next) => {
 });
 
 app.get("/:id", async (req, res, next) => {
-  const park = await Park.findById(req.params.id);
-  if (!park) {
-    return res.json([]);
+  if (req.params.id) {
+    const park = await Park.findById(req.params.id);
+    if (!park) {
+      res.json([]);
+    } else {
+      res.json(park);
+    }
   }
-  res.json(park);
 });
 
 app.get("/parkByOwner/:ownerId", async (req, res, next) => {
   const query = { ownerId: req.params.ownerId };
   const park = await Park.find(query);
   if (!park) {
-    return res.json([]);
+    res.json([]);
+  } else {
+    res.json(park);
   }
-  res.json(park);
 });
 
 app.get("/isAvailable/:id", async (req, res, next) => {

@@ -8,11 +8,39 @@ app.get("/", async (req, res, next) => {
   res.json(allOrders);
 });
 
-app.get("/:id", async (req, res, next) => {
+app.get("/:_id", async (req, res, next) => {
   const query = { _id: req.params._id };
 
   const order = await Order.find(query);
   res.json(order);
+});
+
+app.get("/byParkId/:_id", async (req, res, next) => {
+  const query = { parkId: req.params._id };
+
+  const order = await Order.find(query);
+  res.json(order);
+});
+
+app.get("/byParkAndConsumer/:parkId/:consumerId", async (req, res) => {
+  const query = {
+    parkId: req.params.parkId,
+    consumerId: req.params.consumerId,
+    timeEnd: ""
+  };
+
+  let order
+  try {
+    order = await Order.findOne(query);
+  } catch {
+    order = null
+  }
+
+  if (order) {
+    res.json(order)
+  } else {
+    res.json(false)
+  }
 });
 
 app.get("/orderByConsumer/:consumerId", async (req, res, next) => {
@@ -23,19 +51,18 @@ app.get("/orderByConsumer/:consumerId", async (req, res, next) => {
 
 app.post("/create", (req, res) => {
   const initialOrder = { timeStart: time(), timeEnd: "" };
-  const newOrder = new Order({ ...req.body.order, ...initialOrder });
+  const newOrder = new Order({ ...req.body, ...initialOrder });
   newOrder
     .save()
     .then(() => {
-      res.send("Documented successfully");
+      res.status(200).send("Documented successfully");
     })
     .catch((err) => console.log(err));
 });
 
 app.put("/finishPark", async (req, res) => {
-  const { order: { _id } } = req.body;
+  const { _id } = req.body;
   const query = { _id: _id };
-  // const { order: { _id: query } } = req.body;
 
   const timeEnd = { timeEnd: time() };
   const doc = await Order.findOneAndUpdate(query, timeEnd, {
@@ -68,7 +95,6 @@ const time = () => {
   let seconds = dateObject.getSeconds();
 
   const currTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
-  console.log(currTime);
   return (currTime);
 };
 
