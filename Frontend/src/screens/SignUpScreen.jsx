@@ -38,7 +38,11 @@ export default function SignUpScreen({ navigation }) {
             } else {
                 await createUserWithEmailAndPassword(auth, emailInput, passwordInput)
                     .then(async (userCredential) => {
+<<<<<<< HEAD
                         await axios.post('http://192.168.148.126:3000/users/create', userToAdd)
+=======
+                        await axios.post('http://10.100.102.29:3000/users/create', userToAdd)
+>>>>>>> 00fa217bdf9acab83cc5631ec7fefbc84b61f852
                     })
                     .catch((error) => {
                         Alert.alert('Failed!', `${error.message}`);
@@ -51,7 +55,7 @@ export default function SignUpScreen({ navigation }) {
                         }).then(async () => {
                             const userInfo = JSON.stringify(userToAdd)
                             await AsyncStorage.setItem('@user', userInfo)
-                                                    
+
                             navigation.navigate('Login');
                         }).catch((error) => {
                             Alert.alert('Failed!', `${error.message}`);

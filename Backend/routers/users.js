@@ -14,9 +14,13 @@ app.get("/:id", async (req, res, next) => {
   res.json(user);
 });
 
+<<<<<<< HEAD
 app.get("/byEmail/:email", async (req, res, next) => {
+=======
+app.get("/byEmail/:email", async (req, res) => {
+>>>>>>> 00fa217bdf9acab83cc5631ec7fefbc84b61f852
   const email = req.params.email;
-  const filter = { email: email };
+  const filter = { mail: email };
   const user = await User.findOne(filter);
   res.json(user);
 });

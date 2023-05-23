@@ -11,40 +11,56 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Parking({ navigation, route }) {
     const [parkingInfo, setParkingInfo] = useState({})
-    const [isUserRenting, setIsUserRenting] = useState(false)
+    const [userRent, setUserRent] = useState(false)
 
     useEffect(() => {
         getParkingInfo()
     }, [])
 
     const getParkingInfo = async () => {
+<<<<<<< HEAD
         const userInfo = JSON.parse(await AsyncStorage.getItem('@userInfo'))
         const parkingInfo = await axios.get(`http://192.168.148.126:3000/parks/${route.params._id}`)
         const isRentingParking = await axios.get(`http://192.168.148.126:3000/orders/byParkAndConsumer/${route.params._id}/${userInfo._id}`)
+=======
+        const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
+        const parkingInfo = await axios.get(`http://10.100.102.29:3000/parks/646be83e5d6fe2bb9d78aca4`)
+        console.log(userInfo)
+        const isRentingParking = await axios.get(`http://10.100.102.29:3000/orders/byParkAndConsumer/646be83e5d6fe2bb9d78aca4/${userInfo.id}`)
+        console.log(isRentingParking.data)
+>>>>>>> 00fa217bdf9acab83cc5631ec7fefbc84b61f852
 
-        setIsUserRenting(isRentingParking)
-        setParkingInfo(parkingInfo)
+        setUserRent(isRentingParking.data)
+        setParkingInfo(parkingInfo.data)
     }
 
     const isTimeAllowed = () => {
-
+        return true
     }
 
     const endRentParking = async () => {
-
+        await axios.put(`http://10.100.102.29:3000/orders/finishPark`, { ...userRent }).then(res => {
+            if (res.status == 200) {
+                Alert.alert('Success!', 'Rent ended successfully')
+                navigation.goBack(null)
+            } else {
+                Alert.alert('Failed!', `Couldnt stop renting. Please try again`)
+            }
+        })
     }
 
     const onRentParking = async () => {
-        const userInfo = JSON.parse(await AsyncStorage.getItem('@userInfo'))
+        const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
 
         const newOrder = {
-            parkId: route.params._id,
-            consumerId: userInfo._Id,
+            parkId: "646be83e5d6fe2bb9d78aca4",
+            consumerId: userInfo.id,
             vehicleSerial: 123123123,
             timeStart: new Date(),
             payment: 0
         }
 
+<<<<<<< HEAD
         axios.post(`http://192.168.148.126:3000/orders/create`, newOrder)
         .then(res => {
             if(res.status == 200) {
@@ -54,6 +70,17 @@ export default function Parking({ navigation, route }) {
                 Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
             }
         })
+=======
+        axios.post(`http://10.100.102.29:3000/orders/create`, newOrder)
+            .then(res => {
+                if (res.status == 200) {
+                    Alert.alert('Success!', 'Parking rented successfully')
+                    navigation.goBack(null)
+                } else {
+                    Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
+                }
+            })
+>>>>>>> 00fa217bdf9acab83cc5631ec7fefbc84b61f852
     }
 
     return (
@@ -98,8 +125,8 @@ export default function Parking({ navigation, route }) {
                 value={route.params.price + ' ILS Per Hour'}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
-            {isUserRenting ? <Button title="End Parking" color="red" onPress={endRentParking} /> : null}
-            {!isUserRenting && parkingInfo.isAvailable ?
+            {userRent ? <Button title="End Parking" color="red" onPress={endRentParking} /> : null}
+            {!userRent && parkingInfo?.isAvailable && isTimeAllowed() ?
                 <Button title="Rent Parking" color="blue" onPress={onRentParking} />
                 :
                 <Text>Parking is currently occupied or unusuable!</Text>}
