@@ -41,7 +41,7 @@ export default function MyCars({ navigation, route }) {
             <View style={styles.carsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
                     {vehicles.map((vehicle, index) => (
-                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...vehicle,imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg" })}>
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...vehicle, imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg" })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
                                     style={styles.optionText}>{vehicle.brand} - {vehicle.serial}</Text>

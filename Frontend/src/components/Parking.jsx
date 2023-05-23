@@ -18,17 +18,11 @@ export default function Parking({ navigation, route }) {
     }, [])
 
     const getParkingInfo = async () => {
-<<<<<<< HEAD
-        const userInfo = JSON.parse(await AsyncStorage.getItem('@userInfo'))
-        const parkingInfo = await axios.get(`http://192.168.148.126:3000/parks/${route.params._id}`)
-        const isRentingParking = await axios.get(`http://192.168.148.126:3000/orders/byParkAndConsumer/${route.params._id}/${userInfo._id}`)
-=======
         const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
         const parkingInfo = await axios.get(`http://10.100.102.29:3000/parks/646be83e5d6fe2bb9d78aca4`)
         console.log(userInfo)
         const isRentingParking = await axios.get(`http://10.100.102.29:3000/orders/byParkAndConsumer/646be83e5d6fe2bb9d78aca4/${userInfo.id}`)
         console.log(isRentingParking.data)
->>>>>>> 00fa217bdf9acab83cc5631ec7fefbc84b61f852
 
         setUserRent(isRentingParking.data)
         setParkingInfo(parkingInfo.data)
@@ -60,17 +54,6 @@ export default function Parking({ navigation, route }) {
             payment: 0
         }
 
-<<<<<<< HEAD
-        axios.post(`http://192.168.148.126:3000/orders/create`, newOrder)
-        .then(res => {
-            if(res.status == 200) {
-                Alert.alert('Success!', 'Parking rented successfully')
-                navigation.goBack(null)
-            } else {
-                Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
-            }
-        })
-=======
         axios.post(`http://10.100.102.29:3000/orders/create`, newOrder)
             .then(res => {
                 if (res.status == 200) {
@@ -80,7 +63,6 @@ export default function Parking({ navigation, route }) {
                     Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
                 }
             })
->>>>>>> 00fa217bdf9acab83cc5631ec7fefbc84b61f852
     }
 
     return (

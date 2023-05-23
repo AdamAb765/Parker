@@ -17,16 +17,6 @@ export default function LoginScreen({ navigation }) {
     const onLoginSubmit = async () => {
         if (emailInput && passwordInput) {
             await signInWithEmailAndPassword(auth, emailInput, passwordInput)
-<<<<<<< HEAD
-                .then(async (userCredential) => {
-                    const userInfo = await axios.get(`http://192.168.148.126:3000/users/byEmail/${emailInput}`)
-                    await AsyncStorage.setItem('@user', JSON.stringify(userInfo.data))
-                    console.log(`${userCredential.user.displayName} is logged in!`);
-                })
-                .catch((error) => {
-                    Alert.alert('Failed!', `${error.message}`);
-                });
-=======
             .then(async (userCredential) => {
                 const userInfo = await axios.get(`http://10.100.102.29:3000/users/byEmail/${emailInput}`)
                 await AsyncStorage.setItem('@user', JSON.stringify(userInfo.data))
@@ -36,7 +26,6 @@ export default function LoginScreen({ navigation }) {
             .catch((error) => {
                 Alert.alert('Failed!', `${error.message}`);
             });
->>>>>>> 00fa217bdf9acab83cc5631ec7fefbc84b61f852
         } else {
             Alert.alert('Failed!', 'Please enter all details')
         }
