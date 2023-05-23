@@ -13,10 +13,11 @@ app.get("/:serial", async (req, res, next) => {
   res.json(vehicle);
 });
 
-app.get("/vehicleByOwner/:ownerId", async (req, res, next) => {
-  const query = { ownerId: req.params.ownerId };
-  const vehicle = await Vehicle.find(query);
-  res.json(vehicle);
+app.get("/vehicleByOwner/:ownerId", async (req, res) => {
+    const query = { ownerId: req.params.ownerId };
+    const vehicle = await Vehicle.find(query);
+    res.json(vehicle);
+  // return res.status(404).send("Vehicles not found");
 });
 
 app.post("/create", (req, res) => {

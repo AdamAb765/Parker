@@ -10,9 +10,9 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function MyCar({ navigation, route }) {
-    const [carName, setCarName] = useState(route.params.carName)
-    const [carColor, setColor] = useState(route.params.carColor)
-    const [carNumber, setCarNumber] = useState(route.params.carNumber)
+    const [carName, setCarName] = useState(route.params.brand)
+    const [carColor, setColor] = useState(route.params.color)
+    const [carNumber, setCarNumber] = useState(route.params.serial)
     const [carImage, setCarImage] = useState(route.params.imageUrl);
 
     const pickImage = async () => {
@@ -58,7 +58,7 @@ export default function MyCar({ navigation, route }) {
                 placeholder="Car Number"
                 variant="outlined"
                 style={styles.textInput}
-                value={carNumber}
+                value={String(carNumber)}
                 onChangeText={(newText) => setCarNumber(newText)}
             />
             <TextInput

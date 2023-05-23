@@ -19,8 +19,8 @@ export default function Parking({ navigation, route }) {
 
     const getParkingInfo = async () => {
         const userInfo = JSON.parse(await AsyncStorage.getItem('@userInfo'))
-        const parkingInfo = await axios.get(`http://10.100.102.29:3000/parks/${route.params._id}`)
-        const isRentingParking = await axios.get(`http://10.100.102.29:3000/orders/byParkAndConsumer/${route.params._id}/${userInfo._id}`)
+        const parkingInfo = await axios.get(`http://192.168.148.126:3000/parks/${route.params._id}`)
+        const isRentingParking = await axios.get(`http://192.168.148.126:3000/orders/byParkAndConsumer/${route.params._id}/${userInfo._id}`)
 
         setIsUserRenting(isRentingParking)
         setParkingInfo(parkingInfo)
@@ -45,7 +45,7 @@ export default function Parking({ navigation, route }) {
             payment: 0
         }
 
-        axios.post(`http://10.100.102.29:3000/orders/create`, newOrder)
+        axios.post(`http://192.168.148.126:3000/orders/create`, newOrder)
         .then(res => {
             if(res.status == 200) {
                 Alert.alert('Success!', 'Parking rented successfully')

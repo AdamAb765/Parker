@@ -38,7 +38,7 @@ export default function SignUpScreen({ navigation }) {
             } else {
                 await createUserWithEmailAndPassword(auth, emailInput, passwordInput)
                     .then(async (userCredential) => {
-                        await axios.post('http://10.100.102.6:3000/users/create', userToAdd)
+                        await axios.post('http://192.168.148.126:3000/users/create', userToAdd)
                     })
                     .catch((error) => {
                         Alert.alert('Failed!', `${error.message}`);
