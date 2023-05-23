@@ -29,7 +29,12 @@ app.get("/byParkAndConsumer/:parkId/:consumerId", async (req, res) => {
     timeEnd: ""
   };
 
-  const order = await Order.findOne(query);
+  let order
+  try {
+    order = await Order.findOne(query);
+  } catch {
+    order = null
+  }
 
   if (order) {
     res.json(order)
@@ -90,7 +95,6 @@ const time = () => {
   let seconds = dateObject.getSeconds();
 
   const currTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
-  console.log(currTime);
   return (currTime);
 };
 

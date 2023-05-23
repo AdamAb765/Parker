@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as http from '../api/HttpClient'
 
 import { useTogglePasswordVisibility } from '../hooks/useTogglePasswordVisibility';
 import { auth } from '../../firebase';
@@ -17,15 +18,15 @@ export default function LoginScreen({ navigation }) {
     const onLoginSubmit = async () => {
         if (emailInput && passwordInput) {
             await signInWithEmailAndPassword(auth, emailInput, passwordInput)
-            .then(async (userCredential) => {
-                const userInfo = await axios.get(`http://10.100.102.29:3000/users/byEmail/${emailInput}`)
-                await AsyncStorage.setItem('@user', JSON.stringify(userInfo.data))
-                                        
-                console.log(`${userCredential.user.displayName} is logged in!`);
-            })
-            .catch((error) => {
-                Alert.alert('Failed!', `${error.message}`);
-            });
+                .then(async (userCredential) => {
+                    const userInfo = await http.get(`users/byEmail/${emailInput}`)
+                    await AsyncStorage.setItem('@user', JSON.stringify(userInfo))
+
+                    console.log(`${userCredential.user.displayName} is logged in!`);
+                })
+                .catch((error) => {
+                    Alert.alert('Failed!', `${error.message}`);
+                });
         } else {
             Alert.alert('Failed!', 'Please enter all details')
         }

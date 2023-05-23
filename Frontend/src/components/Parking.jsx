@@ -8,10 +8,12 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as http from '../api/HttpClient'
 
 export default function Parking({ navigation, route }) {
     const [parkingInfo, setParkingInfo] = useState({})
     const [userRent, setUserRent] = useState(false)
+    const [isUsersParking, setIsUsersParking] = useState(false)
 
     useEffect(() => {
         getParkingInfo()
@@ -19,13 +21,12 @@ export default function Parking({ navigation, route }) {
 
     const getParkingInfo = async () => {
         const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
-        const parkingInfo = await axios.get(`http://10.100.102.29:3000/parks/646be83e5d6fe2bb9d78aca4`)
-        console.log(userInfo)
-        const isRentingParking = await axios.get(`http://10.100.102.29:3000/orders/byParkAndConsumer/646be83e5d6fe2bb9d78aca4/${userInfo.id}`)
-        console.log(isRentingParking.data)
+        const parkingInfo = await http.get(`parks/${route.params._id}`)
+        const isRentingParking = await http.get(`orders/byParkAndConsumer/${route.params._id}/${userInfo.id}`)
 
-        setUserRent(isRentingParking.data)
-        setParkingInfo(parkingInfo.data)
+        setUserRent(isRentingParking)
+        setIsUsersParking(userInfo.id == parkingInfo.ownerId)
+        setParkingInfo(parkingInfo)
     }
 
     const isTimeAllowed = () => {
@@ -33,8 +34,8 @@ export default function Parking({ navigation, route }) {
     }
 
     const endRentParking = async () => {
-        await axios.put(`http://10.100.102.29:3000/orders/finishPark`, { ...userRent }).then(res => {
-            if (res.status == 200) {
+        await http.put(`orders/finishPark`, { ...userRent }).then(res => {
+            if (res) {
                 Alert.alert('Success!', 'Rent ended successfully')
                 navigation.goBack(null)
             } else {
@@ -47,16 +48,16 @@ export default function Parking({ navigation, route }) {
         const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
 
         const newOrder = {
-            parkId: "646be83e5d6fe2bb9d78aca4",
+            parkId: route.params._id,
             consumerId: userInfo.id,
             vehicleSerial: 123123123,
             timeStart: new Date(),
             payment: 0
         }
 
-        axios.post(`http://10.100.102.29:3000/orders/create`, newOrder)
+        http.post(`orders/create`, newOrder)
             .then(res => {
-                if (res.status == 200) {
+                if (res) {
                     Alert.alert('Success!', 'Parking rented successfully')
                     navigation.goBack(null)
                 } else {
@@ -71,7 +72,7 @@ export default function Parking({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <Image style={styles.avatar}
                         contentFit='contain'
-                        source={route.params.imageUrl}
+                        source={route.params.image}
                         placeholder={require("../../assets/listing_parking_placeholder.png")} />
                 </View>
             </View>
@@ -96,7 +97,7 @@ export default function Parking({ navigation, route }) {
                 editable={false}
                 style={styles.textInput}
                 label='Parking Location'
-                value={route.params.location}
+                value={route.params.address}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
             <TextInput

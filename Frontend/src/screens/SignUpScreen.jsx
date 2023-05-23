@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from '../../firebase';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as http from '../api/HttpClient'
 
 import { useTogglePasswordVisibility } from '../hooks/useTogglePasswordVisibility';
 
@@ -28,7 +29,7 @@ export default function SignUpScreen({ navigation }) {
                 id: id,
                 firstName: firstNameInput,
                 lastName: lastNameInput,
-                mail: emailInput,
+                email: emailInput,
                 password: passwordInput,
                 phone: contactNumber
             }
@@ -38,7 +39,7 @@ export default function SignUpScreen({ navigation }) {
             } else {
                 await createUserWithEmailAndPassword(auth, emailInput, passwordInput)
                     .then(async (userCredential) => {
-                        await axios.post('http://10.100.102.29:3000/users/create', userToAdd)
+                        await http.post('users/create', userToAdd)
                     })
                     .catch((error) => {
                         Alert.alert('Failed!', `${error.message}`);

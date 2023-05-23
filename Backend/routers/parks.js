@@ -13,20 +13,21 @@ app.get("/:id", async (req, res, next) => {
   if (req.params.id) {
     const park = await Park.findById(req.params.id);
     if (!park) {
-      return res.json([]);
+      res.json([]);
+    } else {
+      res.json(park);
     }
-    res.json(park);
   }
-  res.status(404).send("Not found");
 });
 
 app.get("/parkByOwner/:ownerId", async (req, res, next) => {
   const query = { ownerId: req.params.ownerId };
   const park = await Park.findOne(query);
   if (!park) {
-    return res.json([]);
+    res.json([]);
+  } else {
+    res.json(park);
   }
-  res.json(park);
 });
 
 app.get("/isAvailable/:id", async (req, res, next) => {
