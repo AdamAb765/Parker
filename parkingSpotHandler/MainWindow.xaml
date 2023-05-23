@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:parkingSpotHandler"
         mc:Ignorable="d"
         Background="#FF95CDCD"
-        Title="Parker" Height="250" Width="250">
+        Title="Parker" Height="250" Width="350">
     <Window.Resources>
         <Style x:Key="RoundCorner" TargetType="{x:Type Button}">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -82,13 +82,13 @@
 
         <TextBlock Text="Parker" Foreground="#FF3120D4" FontWeight="Bold" Grid.ColumnSpan="2" HorizontalAlignment="Center"  FontSize="30" />
 
-        <Label Grid.Row="1" Grid.Column="0" Foreground="#FF3120D4" VerticalAlignment="Center" FontWeight="SemiBold" Content="Username:" Margin="0,10,0,10"/>
+        <Label Grid.Row="1" Grid.Column="0" Foreground="#FF3120D4" VerticalAlignment="Center" FontWeight="SemiBold" Content="Email:" Margin="0,10,0,10"/>
         <TextBox x:Name="txtUsername" Background="#FF598DD8"  Grid.Row="1" Grid.Column="1" Margin="0,10,0,10"/>
 
         <Label Grid.Row="2" Grid.Column="0" Foreground="#FF3120D4" VerticalAlignment="Center" FontWeight="SemiBold" Content="Password:" Margin="0,10,0,10" />
         <PasswordBox x:Name="txtPassword" Background="#FF598DD8" Grid.Row="2" Grid.Column="1" Margin="0,10,0,10"/>
 
         <Button Grid.Row="3" Grid.ColumnSpan="2" Style="{DynamicResource RoundCorner}" Margin="0 15 0 0" Background="#FF3120D4" Foreground="White" Content="Login" Click="BtnLogin_Click" />
-        <TextBlock x:Name="txtError" Grid.Row="4" Grid.ColumnSpan="2" Foreground="Red" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="txtError" Grid.Row="4" FontSize="20" Grid.ColumnSpan="2" Foreground="Red" HorizontalAlignment="Center"/>
     </Grid>
 </Window>

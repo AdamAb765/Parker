@@ -19,7 +19,7 @@ app.get("/:id", async (req, res, next) => {
 
 app.get("/parkByOwner/:ownerId", async (req, res, next) => {
   const query = { ownerId: req.params.ownerId };
-  const park = await Park.findOne(query);
+  const park = await Park.find(query);
   if (!park) {
     return res.json([]);
   }
@@ -31,21 +31,25 @@ app.get("/isAvailable/:id", async (req, res, next) => {
   if (!park) {
     return res.json([]);
   }
-  const cameraUrl = "http://" + park.cameraIpAddress + ":" +
-    park.cameraPort + "/captureParking/" + park.cameraName;
+  const cameraUrl =
+    "http://" +
+    park.cameraIpAddress +
+    ":" +
+    park.cameraPort +
+    "/captureParking/" +
+    park.cameraName;
   await get(cameraUrl)
-    .then(ans => {
+    .then((ans) => {
       console.log(ans.data.results);
       if (Array.isArray(ans.data.results) && ans.data.results.length) {
         res.status(200).send(false);
       } else {
         res.status(200).send(true);
       }
-
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
-    })
+    });
 });
 
 app.post("/create", (req, res) => {
@@ -74,16 +78,15 @@ app.put("/setCamera", async (req, res) => {
   const camera = {
     cameraName: req.body.cameraName,
     cameraPort: req.body.cameraPort,
-    cameraIpAddress: req.body.cameraIpAddress
-  }
+    cameraIpAddress: req.body.cameraIpAddress,
+  };
   console.log(camera);
   const doc = await Park.findOneAndUpdate(query, camera, {
     returnOriginal: false,
-    multi: true
+    multi: true,
   });
 
   res.json(doc);
 });
-
 
 module.exports = app;
