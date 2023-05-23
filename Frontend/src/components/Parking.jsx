@@ -9,6 +9,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as http from '../api/HttpClient'
+import { Picker } from '@react-native-picker/picker';
 
 export default function Parking({ navigation, route }) {
     const [parkingInfo, setParkingInfo] = useState({})
@@ -65,6 +66,7 @@ export default function Parking({ navigation, route }) {
                 }
             })
     }
+    const [selectedLanguage, setSelectedLanguage] = useState();
 
     return (
         <View style={styles.container}>
@@ -76,65 +78,98 @@ export default function Parking({ navigation, route }) {
                         placeholder={require("../../assets/listing_parking_placeholder.png")} />
                 </View>
             </View>
-            <TextInput
-                variant={'outlined'}
-                editable={false}
-                label='Parking Title'
-                style={styles.textInput}
-                value={route.params.title}
-                onChangeText={(newText) => setTitleInput(newText)}
-            />
-            <TextInput
-                variant={'outlined'}
-                editable={false}
-                style={styles.textInput}
-                label='Parking Instructions'
-                value={route.params.instructions}
-                onChangeText={(newText) => setInstructionsInput(newText)}
-            />
-            <TextInput
-                variant={'outlined'}
-                editable={false}
-                style={styles.textInput}
-                label='Parking Location'
-                value={route.params.address}
-                onChangeText={(newText) => setLocationInput(newText)}
-            />
-            <TextInput
-                variant={'outlined'}
-                editable={false}
-                style={styles.textInput}
-                label='Parking Price'
-                value={route.params.price + ' ILS Per Hour'}
-                onChangeText={(newText) => setLocationInput(newText)}
-            />
-            {userRent ? <Button title="End Parking" color="red" onPress={endRentParking} /> : null}
-            {!userRent && parkingInfo?.isAvailable && isTimeAllowed() ?
-                <Button title="Rent Parking" color="blue" onPress={onRentParking} />
-                :
-                <Text>Parking is currently occupied or unusuable!</Text>}
+            <View style={{ display: 'flex', flexDirection: 'row', width: '90%', height: '10%', justifyContent: 'space-evenly' }}>
+                <TextInput
+                    variant={'outlined'}
+                    editable={false}
+                    label='Parking Start Time'
+                    style={styles.timeText}
+                    value={route.params.accessibleStartTime}
+                    onChangeText={(newText) => setTitleInput(newText)}
+                />
+                <TextInput
+                    variant={'outlined'}
+                    editable={false}
+                    label='Parking End Time'
+                    style={styles.timeText}
+                    value={route.params.accessibleEndTime}
+                    onChangeText={(newText) => setTitleInput(newText)}
+                />
+            </View>
+            <View style={{ display: 'flex', flexDirection: 'column', width: '90%', height: '34%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                <TextInput
+                    variant={'outlined'}
+                    editable={false}
+                    label='Parking Title'
+                    style={styles.textInput}
+                    value={route.params.title}
+                    onChangeText={(newText) => setTitleInput(newText)}
+                />
+                <TextInput
+                    variant={'outlined'}
+                    editable={false}
+                    style={styles.textInput}
+                    label='Parking Instructions'
+                    value={route.params.instructions}
+                    onChangeText={(newText) => setInstructionsInput(newText)}
+                />
+                <TextInput
+                    variant={'outlined'}
+                    editable={false}
+                    style={styles.textInput}
+                    label='Parking Location'
+                    value={route.params.address}
+                    onChangeText={(newText) => setLocationInput(newText)}
+                />
+                <TextInput
+                    variant={'outlined'}
+                    editable={false}
+                    style={styles.textInput}
+                    label='Parking Price'
+                    value={route.params.price + ' ILS Per Hour'}
+                    onChangeText={(newText) => setLocationInput(newText)}
+                />
+            </View>
+            <View style={{ display: 'flex', flexDirection: 'column', width: '90%', height: '10%', justifyContent: 'center', marginTop: 20 }} >
+                <Picker
+                    selectedValue={selectedLanguage}
+                    onValueChange={(itemValue, itemIndex) =>
+                        setSelectedLanguage(itemValue)
+                    }>
+                    <Picker.Item label="Java" value="java" />
+                    <Picker.Item label="JavaScript" value="js" />
+                </Picker>
+                {/* {userRent ? <Button title="End Parking" color="red" onPress={endRentParking} /> : null}
+                {!userRent && parkingInfo?.isAvailable && isTimeAllowed() ?
+                    <Button title="Rent Parking" color="blue" onPress={onRentParking} />
+                    :
+                    <Text>Parking is currently occupied or unusuable!</Text>} */}
+            </View>
 
         </View>
     );
+
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-evenly',
+        display: 'flex',
+        flexDirection: 'column',
         alignContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     header: {
-        height: '47.5%',
+        height: '40%',
         width: '100%'
     },
     headerContent: {
         alignItems: 'center',
     },
     avatar: {
-        width: 370,
-        height: 270,
+        width: 330,
+        height: 230,
         marginTop: 10
     },
     name: {
@@ -143,8 +178,12 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     textInput: {
-        width: '70%',
-        height: '8%',
+        width: '100%',
+        height: '27%',
         marginBottom: 5,
     },
+    timeText: {
+        width: '40%',
+        height: '5%'
+    }
 })
