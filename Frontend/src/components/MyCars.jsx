@@ -7,6 +7,7 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as http from '../api/HttpClient'
 
 export default function MyCars({ navigation, route }) {
     const [isRequestingCars, setIsRequestingCars] = useState(true)
@@ -15,10 +16,9 @@ export default function MyCars({ navigation, route }) {
 
     const fetchFromServer = async () => {
         const user = JSON.parse(await AsyncStorage.getItem('@user'));
-        const allVehicles = await axios.get("http://192.168.148.126:3000/vehicles/vehicleByOwner/" + user.id);
-        setVehicles(allVehicles.data)
-        setUserId(user.id);
-        console.log(allVehicles.data)
+        const allVehicles = await http.get("vehicles/vehicleByOwner/" + user.id);
+
+        setVehicles(allVehicles)
     }
 
     useEffect(() => {
@@ -41,7 +41,7 @@ export default function MyCars({ navigation, route }) {
             <View style={styles.carsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
                     {vehicles.map((vehicle, index) => (
-                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...vehicle, imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg" })}>
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...vehicle })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
                                     style={styles.optionText}>{vehicle.brand} - {vehicle.serial}</Text>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     optionText: {
-        fontSize: '20',
+        fontSize: 20,
         color: '#6a717d',
     },
     header: {

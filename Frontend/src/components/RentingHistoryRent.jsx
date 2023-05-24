@@ -14,7 +14,7 @@ import { Image } from 'expo-image';
 export default function RentingHistoryRent({ navigation, route }) {
 
     const calcMoneyMade = () => {
-        return ((Math.abs(route.params.endTime - route.params.startTime) / 36e5) * route.params.price).toFixed(2)
+        return ((Math.abs(new Date(route.params.timeEnd) - new Date(route.params.timeStart)) / 36e5) * route.params.parking.price).toFixed(2)
     }
 
     return (
@@ -23,7 +23,7 @@ export default function RentingHistoryRent({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <Image style={styles.avatar}
                         contentFit='contain'
-                        source={route.params.imageUrl}
+                        source={route.params.parking.image}
                         placeholder={require("../../assets/listing_parking_placeholder.png")} />
                 </View>
             </View>
@@ -32,21 +32,21 @@ export default function RentingHistoryRent({ navigation, route }) {
                 editable={false}
                 label='Parking Title'
                 style={styles.textInput}
-                value={route.params.title}
+                value={route.params.parking.title}
             />
             <TextInput
                 variant={'outlined'}
                 editable={false}
                 label='Start Time'
                 style={styles.textInput}
-                value={route.params.startTime.toLocaleString()}
+                value={new Date(route.params.timeStart).toLocaleString()}
             />
             <TextInput
                 variant={'outlined'}
                 editable={false}
                 style={styles.textInput}
                 label='End Time'
-                value={route.params.endTime.toLocaleString()}
+                value={new Date(route.params.timeEnd).toLocaleString()}
             />
             <TextInput
                 variant={'outlined'}

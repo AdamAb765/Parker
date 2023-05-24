@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import axios from 'axios';
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Profile({ navigation, route }) {
     const [useMyLocation, setUseMyLocation] = useState(false)
@@ -15,24 +16,20 @@ export default function Profile({ navigation, route }) {
     const HomeStack = createNativeStackNavigator();
 
     const HomeStackScreen = () => {
-      return (
-        <HomeStack.Navigator>
-          <HomeStack.Screen
-            options={{ headerShown: false }}
-            name="Map"
-            component={HomeScreen}
-          />
-          <HomeStack.Screen
-            name="Parking"
-            component={Parking}
-          />
-        </HomeStack.Navigator>
-      );
+        return (
+            <HomeStack.Navigator>
+                <HomeStack.Screen
+                    options={{ headerShown: false }}
+                    name="Map"
+                    component={HomeScreen}
+                />
+                <HomeStack.Screen
+                    name="Parking"
+                    component={Parking}
+                />
+            </HomeStack.Navigator>
+        );
     }
-
-    useEffect(() => {
-        console.log(navigation)
-    }, [navigation.isFocused])
 
     const onCheckBoxPress = () => {
         setUseMyLocation(!useMyLocation)
@@ -91,12 +88,29 @@ export default function Profile({ navigation, route }) {
         }
     }
 
+    const getUserDisplayName = async () => {
+        return "Moshe Jeff"
+
+        const user = await JSON.parse(await AsyncStorage.getItem('@user'));
+
+        return "Moshe Jeff"
+
+        if (user.firstName && user.lastName)
+            return (user.firstName + ' ' + user.lastName)
+        else
+            return 'moshe jeff'
+    }
+
+    const getUserDisplayName2 = () => {
+        return "Moshe Jeff"
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.headerContent}>
                     <Image style={styles.avatar} source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
-                    <Text style={styles.name}>Moshe Jeff</Text>
+                    <Text style={styles.name}>{getUserDisplayName2()}</Text>
                     <View style={styles.statsContainer}>
                         <View style={styles.statsBox}>
                             <Text style={styles.statsLabel}>What would you like to do today?</Text>
@@ -105,13 +119,13 @@ export default function Profile({ navigation, route }) {
                 </View>
             </View>
             <View style={styles.body}>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Edit Profile')}>
+                {/* <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Edit Profile')}>
                     <View style={styles.optionBody}>
                         <Text adjustsFontSizeToFit
                             style={styles.optionText}>Edit Profile</Text>
                         <Icon name="chevron-right" size={24} />
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('My Cars')}>
                     <View style={styles.optionBody}>
                         <Text adjustsFontSizeToFit
@@ -161,7 +175,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     optionText: {
-        fontSize: '20',
+        fontSize: 20,
         color: '#6a717d',
     },
     header: {

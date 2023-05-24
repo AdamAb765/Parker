@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
@@ -10,15 +10,27 @@ import { Image } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as http from '../api/HttpClient'
 import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function Parking({ navigation, route }) {
     const [parkingInfo, setParkingInfo] = useState({})
     const [userRent, setUserRent] = useState(false)
     const [isUsersParking, setIsUsersParking] = useState(false)
+    const [userCars, setUserCars] = useState([])
+    const [isCarsDropdownOpen, setIsCarsDropdownOpen] = useState(false);
+    const [chosenCar, setChosenCar] = useState(null);
 
     useEffect(() => {
         getParkingInfo()
+        getUserCars()
     }, [])
+
+    const getUserCars = async () => {
+        const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
+        const cars = await http.get(`vehicles/vehicleByOwner/${userInfo.id}`)
+
+        setUserCars(cars)
+    }
 
     const getParkingInfo = async () => {
         const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
@@ -31,7 +43,11 @@ export default function Parking({ navigation, route }) {
     }
 
     const isTimeAllowed = () => {
-        return true
+        const now = new Date()
+        const regex = new RegExp(':', 'g')
+
+        return parseInt(now.toLocaleTimeString().replace(regex, ''), 10) > parseInt(parkingInfo?.accessibleStartTime.replace(regex, ''), 10) &&
+            parseInt(now.toLocaleTimeString().replace(regex, ''), 10) < parseInt(parkingInfo?.accessibleEndTime.replace(regex, ''), 10)
     }
 
     const endRentParking = async () => {
@@ -48,25 +64,38 @@ export default function Parking({ navigation, route }) {
     const onRentParking = async () => {
         const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
 
-        const newOrder = {
-            parkId: route.params._id,
-            consumerId: userInfo.id,
-            vehicleSerial: 123123123,
-            timeStart: new Date(),
-            payment: 0
-        }
+        if (chosenCar) {
 
-        http.post(`orders/create`, newOrder)
-            .then(res => {
-                if (res) {
-                    Alert.alert('Success!', 'Parking rented successfully')
-                    navigation.goBack(null)
-                } else {
-                    Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
-                }
-            })
+            const newOrder = {
+                parkId: route.params._id,
+                consumerId: userInfo.id,
+                vehicleSerial: chosenCar,
+                timeStart: new Date(),
+                payment: 0
+            }
+
+            http.post(`orders/create`, newOrder)
+                .then(res => {
+                    if (res) {
+                        Alert.alert('Success!', 'Parking rented successfully')
+                        navigation.goBack(null)
+                    } else {
+                        Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
+                    }
+                })
+        } else {
+            Alert.alert('Parking Failed!', `Please choose a car for parking. If you dont have any, please add one in your profile`)
+        }
     }
-    const [selectedLanguage, setSelectedLanguage] = useState();
+
+    const createDropDownValues = () => {
+        return userCars.map(car => {
+            return {
+                label: `${car.serial} ${car.color} ${car.brand}`,
+                value: car.serial
+            }
+        })
+    }
 
     return (
         <View style={styles.container}>
@@ -84,7 +113,7 @@ export default function Parking({ navigation, route }) {
                     editable={false}
                     label='Parking Start Time'
                     style={styles.timeText}
-                    value={route.params.accessibleStartTime}
+                    value={parkingInfo?.accessibleStartTime}
                     onChangeText={(newText) => setTitleInput(newText)}
                 />
                 <TextInput
@@ -92,7 +121,7 @@ export default function Parking({ navigation, route }) {
                     editable={false}
                     label='Parking End Time'
                     style={styles.timeText}
-                    value={route.params.accessibleEndTime}
+                    value={parkingInfo?.accessibleEndTime}
                     onChangeText={(newText) => setTitleInput(newText)}
                 />
             </View>
@@ -130,15 +159,35 @@ export default function Parking({ navigation, route }) {
                     onChangeText={(newText) => setLocationInput(newText)}
                 />
             </View>
-            <View style={{ display: 'flex', flexDirection: 'column', width: '90%', height: '10%', justifyContent: 'center', marginTop: 20 }} >
-                <Picker
-                    selectedValue={selectedLanguage}
-                    onValueChange={(itemValue, itemIndex) =>
-                        setSelectedLanguage(itemValue)
-                    }>
-                    <Picker.Item label="Java" value="java" />
-                    <Picker.Item label="JavaScript" value="js" />
-                </Picker>
+            <View style={{ display: 'flex', flexDirection: 'row', width: '77%', height: '15%', justifyContent: 'space-around', alignItems: 'center', marginTop: 20 }} >
+                {isUsersParking ?
+                    (parkingInfo?.isAvailable ?
+                        <Text>Your parking is currently unoccupied!</Text>
+                        :
+                        <Text>Your parking is currently occupied</Text>)
+                    :
+                    parkingInfo?.isAvailable && isTimeAllowed() && !userRent ?
+                        <>
+                            <DropDownPicker
+                                style={styles.dropdown}
+                                open={isCarsDropdownOpen}
+                                value={chosenCar}
+                                items={createDropDownValues()}
+                                setOpen={setIsCarsDropdownOpen}
+                                setValue={setChosenCar}
+                                setItems={setUserCars}
+                                placeholder="Select Your Car"
+                                placeholderStyle={styles.placeholderStyles}
+                                zIndex={3000}
+                                zIndexInverse={1000}
+                            />
+                            <Button title="Rent Parking" color="blue" style={styles.btn} onPress={onRentParking} />
+                        </>
+                        :
+                        userRent ?
+                            <Button title="End Parking" color="red" style={styles.btn} onPress={endRentParking} />
+                            :
+                            <Text>Parking is currently occupied or unusuable!</Text>}
                 {/* {userRent ? <Button title="End Parking" color="red" onPress={endRentParking} /> : null}
                 {!userRent && parkingInfo?.isAvailable && isTimeAllowed() ?
                     <Button title="Rent Parking" color="blue" onPress={onRentParking} />
@@ -185,5 +234,15 @@ const styles = StyleSheet.create({
     timeText: {
         width: '40%',
         height: '5%'
+    },
+    placeholderStyles: {
+        color: "grey",
+    },
+    btn: {
+        height: '40%',
+        width: '55%'
+    },
+    dropdown: {
+        width: '65%'
     }
 })

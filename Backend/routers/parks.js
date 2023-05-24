@@ -21,7 +21,7 @@ app.get("/:id", async (req, res, next) => {
   }
 });
 
-app.get("/parkByOwner/:ownerId", async (req, res, next) => {
+app.get("/parkByOwner/:ownerId", async (req, res) => {
   const query = { ownerId: req.params.ownerId };
   const park = await Park.find(query);
   if (!park) {
@@ -45,19 +45,20 @@ app.get("/isAvailable/:id", async (req, res, next) => {
 });
 
 app.post("/create", (req, res) => {
-  const newPark = new Park(req.body.park);
+  const newPark = new Park(req.body)
+
   newPark
     .save()
     .then(() => {
-      console.log("Successfully added park!");
-      res.send("Added successfully");
+      res.status(200).send("Added successfully");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(404).send("Failed to add parking"));
 });
 
 app.put("/edit", async (req, res) => {
-  const { park } = req.body;
+  const park = new Park(req.body);
   const query = { _id: park._id };
+
   const doc = await Park.findOneAndUpdate(query, park, {
     returnOriginal: false,
   });

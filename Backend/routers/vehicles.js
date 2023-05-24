@@ -21,13 +21,13 @@ app.get("/vehicleByOwner/:ownerId", async (req, res) => {
 });
 
 app.post("/create", (req, res) => {
-  const newVehicle = new Vehicle(req.body.vehicle);
+  const newVehicle = new Vehicle(req.body);
   newVehicle
     .save()
     .then(() => {
-      res.send("Vehicle added successfully");
+      res.status(200).send("Vehicle added successfully");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(404).send('Failed to add vehicle'));
 });
 
 app.put("/edit", async (req, res) => {

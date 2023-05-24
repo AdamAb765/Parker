@@ -27,6 +27,26 @@ app.get("/byParkId/:_id", async (req, res, next) => {
   res.json(order);
 });
 
+app.get("/byConsumerIsRenting/:consumerId", async (req, res) => {
+  const query = {
+    consumerId: req.params.consumerId,
+    timeEnd: ""
+  };
+
+  let order
+  try {
+    order = await Order.findOne(query);
+  } catch {
+    order = null
+  }
+
+  if (order) {
+    res.json(order)
+  } else {
+    res.json(false)
+  }
+});
+
 app.get("/byParkAndConsumer/:parkId/:consumerId", async (req, res) => {
   const query = {
     parkId: req.params.parkId,
