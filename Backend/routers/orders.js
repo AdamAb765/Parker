@@ -1,5 +1,10 @@
 const { Router } = require("express");
 const Order = require("../models/Order");
+const Park = require("../models/Park");
+const {
+  isParkingSpotAvalibale,
+  getCurrLicensePlate,
+} = require("../common/prakingSpotsBL");
 
 const app = Router();
 
@@ -46,20 +51,20 @@ app.get("/byParkAndConsumer/:parkId/:consumerId", async (req, res) => {
   const query = {
     parkId: req.params.parkId,
     consumerId: req.params.consumerId,
-    timeEnd: ""
+    timeEnd: "",
   };
 
-  let order
+  let order;
   try {
     order = await Order.findOne(query);
   } catch {
-    order = null
+    order = null;
   }
 
   if (order) {
-    res.json(order)
+    res.json(order);
   } else {
-    res.json(false)
+    res.json(false);
   }
 });
 
@@ -69,29 +74,51 @@ app.get("/orderByConsumer/:consumerId", async (req, res, next) => {
   res.json(order);
 });
 
-app.post("/create", (req, res) => {
-  const initialOrder = { timeStart: time(), timeEnd: "" };
+app.post("/create", async (req, res) => {
+  const initialOrder = { timeEnd: "" };
   const newOrder = new Order({ ...req.body, ...initialOrder });
-  newOrder
-    .save()
-    .then(() => {
-      res.status(200).send("Documented successfully");
-    })
-    .catch((err) => console.log(err));
+
+  const park = await Park.findById(newOrder.parkId);
+  if (!park) {
+    return res.status(404).send("Parking spot not found");
+  }
+
+  if (!park.cameraIpAddress || !park.cameraName || !park.cameraPort) {
+    return res.status(403).send("Parking camera not detected");
+  }
+
+  if (await isParkingSpotAvalibale(park)) {
+    newOrder
+      .save()
+      .then(() => {
+        res.status(200).send("Documented successfully");
+      })
+      .catch((err) => console.log(err));
+  } else {
+    res.status(403).send("The parking spot already taken");
+  }
 });
 
 app.put("/finishPark", async (req, res) => {
   const { _id } = req.body;
   const query = { _id: _id };
 
-  const timeEnd = { timeEnd: time() };
-  const doc = await Order.findOneAndUpdate(query, timeEnd, {
-    returnOriginal: false,
-  });
+  const order = await Order.findById(_id);
+  const park = await Park.findById(order.parkId);
 
-  res.json(doc);
+  const serial = await getCurrLicensePlate(park);
+
+  if (!serial || order.vehicleSerial !== parseInt(serial)) {
+    const timeEnd = { timeEnd: time() };
+    const doc = await Order.findOneAndUpdate(query, timeEnd, {
+      returnOriginal: false,
+    });
+
+    res.json(doc);
+  } else {
+    res.status(403).json([]);
+  }
 });
-
 
 app.put("/edit", async (req, res) => {
   const { order } = req.body;
@@ -114,8 +141,19 @@ const time = () => {
   let minutes = dateObject.getMinutes();
   let seconds = dateObject.getSeconds();
 
-  const currTime = year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds;
-  return (currTime);
+  const currTime =
+    year +
+    "-" +
+    month +
+    "-" +
+    date +
+    " " +
+    hours +
+    ":" +
+    minutes +
+    ":" +
+    seconds;
+  return currTime;
 };
 
 module.exports = app;
