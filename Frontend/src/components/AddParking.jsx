@@ -130,13 +130,13 @@ export default function AddParking({ navigation, route }) {
                 </View>
             </View>
             <View style={{ display: 'flex', flexDirection: 'row', width: '90%', height: '10%', justifyContent: 'space-evenly' }}>
-                <TextInput
+                {/* <TextInput
                     variant={'outlined'}
                     editable={false}
                     label='Parking Start Time'
                     style={styles.timeText}
-                    value={parkingInfo?.accessibleStartTime}
-                    onChangeText={(newText) => setTitleInput(newText)}
+                    value={accessibleStartTime}
+                    onChangeText={(newText) => setAccessibleStartTime(newText)}
                 />
                 <TextInput
                     variant={'outlined'}
@@ -145,7 +145,7 @@ export default function AddParking({ navigation, route }) {
                     style={styles.timeText}
                     value={parkingInfo?.accessibleEndTime}
                     onChangeText={(newText) => setTitleInput(newText)}
-                />
+                /> */}
             </View>
             <TextInput
                 placeholder="Parking Title"
