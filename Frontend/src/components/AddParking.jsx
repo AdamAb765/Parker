@@ -1,26 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
-import MapView, { Callout } from 'react-native-maps';
-import { Marker } from 'react-native-maps';
 import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import * as Location from 'expo-location'
 import { View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
-import { CheckBox } from '@rneui/themed'
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as http from '../api/HttpClient'
+import RNDateTimePicker from '@react-native-community/datetimepicker';
+import NumericInput from 'react-native-numeric-input';
 
 export default function AddParking({ navigation, route }) {
-    //const [useMyLocation, setUseMyLocation] = useState(false)
     const [titleInput, setTitleInput] = useState('')
     const [instructionInput, setInstructionsInput] = useState('')
     const [locationInput, setLocationInput] = useState('')
-    const [accessibleStartTime, setAccessibleStartTime] = useState('')
-    const [accessibleEndTime, setAccessibleEndTime] = useState('')
-    const [price, setPrice] = useState('')
+    const [accessibleStartTime, setAccessibleStartTime] = useState(new Date())
+    const [accessibleEndTime, setAccessibleEndTime] = useState(new Date())
+    const [price, setPrice] = useState(0)
     const [parkingImage, setParkingImage] = useState(null);
 
     const pickImage = async () => {
@@ -35,25 +31,6 @@ export default function AddParking({ navigation, route }) {
             setParkingImage(result.assets[0].uri)
         }
     };
-
-    const onCheckBoxPress = () => {
-        setUseMyLocation(!useMyLocation)
-    }
-
-    const getMyLocation = async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-            return;
-        }
-
-        let location = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-            enableHighAccuracy: true,
-            timeInterval: 5
-        })
-
-        return location
-    }
 
     const getGeoLocationFromInput = async () => {
         const searchInputResult = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?&address=${locationInput}&key=AIzaSyCZ-6i7NFhGDzMJl1546n-2EI0laWUc2Hc`)
@@ -74,7 +51,8 @@ export default function AddParking({ navigation, route }) {
     }
 
     const onCreateParking = async () => {
-        if (titleInput && instructionInput) {
+        if (titleInput && instructionInput && accessibleStartTime && accessibleEndTime &&
+            (price != 0) && locationInput && parkingImage) {
             let currentLocation
 
             // if (useMyLocation) {
@@ -85,12 +63,16 @@ export default function AddParking({ navigation, route }) {
 
             if (currentLocation && currentLocation.coords) {
                 const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
+
                 const newParking = {
                     ownerId: userInfo.id,
-                    accessibleStartTime: 'accessibleStartTime',
-                    accessibleEndTime: 'accessibleEndTime',
-                    price: 5,
+                    title: titleInput,
+                    instructions: instructionInput,
+                    accessibleStartTime: accessibleStartTime.toLocaleTimeString(),
+                    accessibleEndTime: accessibleEndTime.toLocaleTimeString(),
+                    price: price,
                     address: locationInput,
+                    image: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170",
                     longitude: currentLocation.coords.longitude,
                     latitude: currentLocation.coords.latitude,
                     isAvailable: true,
@@ -107,12 +89,11 @@ export default function AddParking({ navigation, route }) {
                         Alert.alert('Failed!', 'Failed to add parking. Please try again')
                     }
                 })
-
             } else {
                 Alert.alert('Failed!', `Either this parking spot doesnt exist, or youre not using own location. Please try again`)
             }
         } else {
-            Alert.alert('Failed!', 'Please enter all details')
+            Alert.alert('Failed!', 'Please make sure you filled all the fields, times, price and picture')
         }
     }
 
@@ -129,23 +110,37 @@ export default function AddParking({ navigation, route }) {
                     <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
                 </View>
             </View>
-            <View style={{ display: 'flex', flexDirection: 'row', width: '90%', height: '10%', justifyContent: 'space-evenly' }}>
-                {/* <TextInput
-                    variant={'outlined'}
-                    editable={false}
-                    label='Parking Start Time'
-                    style={styles.timeText}
+            <View style={{ display: 'flex', flexDirection: 'row', width: '65%', height: '10%', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <Text>Start:</Text>
+                <RNDateTimePicker
+                    mode="time"
                     value={accessibleStartTime}
-                    onChangeText={(newText) => setAccessibleStartTime(newText)}
-                />
-                <TextInput
-                    variant={'outlined'}
-                    editable={false}
-                    label='Parking End Time'
-                    style={styles.timeText}
-                    value={parkingInfo?.accessibleEndTime}
-                    onChangeText={(newText) => setTitleInput(newText)}
-                /> */}
+                    is24Hour={true}
+                    onChange={(e, newDate) => { setAccessibleStartTime(newDate) }} />
+                <Text style={{ marginLeft: 50 }}>End:</Text>
+                <RNDateTimePicker
+                    mode="time"
+                    value={accessibleEndTime}
+                    is24Hour={true}
+                    onChange={(e, newDate) => { setAccessibleEndTime(newDate) }} />
+            </View>
+
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '70%', justifyContent: 'space-evenly', marginBottom: 10 }}>
+                <Text>Price:</Text>
+                <NumericInput
+                    value={price}
+                    onChange={value => { setPrice(value) }}
+                    minValue={0}
+                    totalWidth={160}
+                    totalHeight={50}
+                    iconSize={25}
+                    step={1}
+                    valueType='real'
+                    rounded
+                    textColor='black'
+                    iconStyle={{ color: 'white' }}
+                    rightButtonBackgroundColor='blue'
+                    leftButtonBackgroundColor='blue' />
             </View>
             <TextInput
                 placeholder="Parking Title"
@@ -162,11 +157,9 @@ export default function AddParking({ navigation, route }) {
             <TextInput
                 placeholder="Parking Location"
                 variant={'outlined'}
-                //editable={!useMyLocation}
                 style={styles.textInput}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
-            {/* <CheckBox onPress={() => onCheckBoxPress()} checked={useMyLocation} title="Would you like to use your current location?" /> */}
             <Button title="Create Parking" color="blue" onPress={onCreateParking} />
         </View>
     );
@@ -175,12 +168,11 @@ export default function AddParking({ navigation, route }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'space-evenly',
         alignContent: 'center',
         alignItems: 'center'
     },
     header: {
-        height: '47.5%',
+        height: '43%',
         width: '100%'
     },
     headerContent: {
@@ -189,7 +181,7 @@ const styles = StyleSheet.create({
     avatar: {
         width: 370,
         height: 240,
-        marginTop: 10
+        marginTop: 5
     },
     name: {
         fontSize: 22,
@@ -211,7 +203,7 @@ const styles = StyleSheet.create({
     },
     textInput: {
         width: '70%',
-        height: '10%',
+        height: '9%',
         marginBottom: 5,
     },
 })

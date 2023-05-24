@@ -6,28 +6,29 @@ import axios from 'axios';
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as http from '../api/HttpClient'
+import useInterval from '../hooks/useInterval';
 
 export default function MyParkingSpots({ navigation, route }) {
     const [isRequestingParkings, setIsRequestingParkings] = useState(true)
     const [myParkingSpots, setMyParkingSpots] = useState([]);
 
     useEffect(() => {
-        //request cars
-        setMyParkingSpots([{
-            title: 'Parking in middle of Tel Aviv',
-            location: 'Rotschild 69 Tel Aviv',
-            owner: {
-                firstName: 'Adam',
-                lastName: 'Abraham',
-                contact: '0528535752'
-            },
-            price: '15',
-            instructions: 'Call when reached the parking',
-            imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170",
-            isVacant: true,
-        }])
-        setIsRequestingParkings(false)
+        getMyParkingSpots()
     }, [])
+
+    const getMyParkingSpots = async () => {
+        const user = JSON.parse(await AsyncStorage.getItem('@user'));
+
+        const parkingSpots = await http.get(`parks/parkByOwner/${user.id}`)
+        setMyParkingSpots(parkingSpots)
+        setIsRequestingParkings(false)
+    }
+
+    useInterval(() => {
+        getMyParkingSpots()
+    }, 2000)
 
     return (
         <View style={styles.container}>
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     optionText: {
-        fontSize: '20',
+        fontSize: 20,
         color: '#6a717d',
     },
     header: {
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     },
     body: {
         alignItems: 'center',
-        padding: 10,
+        padding: 15,
         flexDirection: 'column',
         flexWrap: 'wrap',
     },

@@ -10,6 +10,8 @@ import { CheckBox } from '@rneui/themed'
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
+import * as http from '../api/HttpClient'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AddCar({ navigation, route }) {
     const [carName, setCarName] = useState('')
@@ -30,11 +32,27 @@ export default function AddCar({ navigation, route }) {
         }
     };
 
-    const onAddCar = () => {
+    const onAddCar = async () => {
         if (carName && carImage && carNumber && carColor) {
-            Alert.alert('Success!', 'Car added successfully')
-            //try add to db
-            navigation.goBack()
+            const user = JSON.parse(await AsyncStorage.getItem('@user'));
+
+            const carToAdd = {
+                serial: carNumber,
+                color: carColor,
+                brand: carName,
+                ownerId: user.id,
+                image: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg"
+            }
+
+            http.post('vehicles/create', carToAdd).then(res => {
+                if (res) {
+                    Alert.alert('Success!', 'Car added successfully')
+                    navigation.goBack(null)
+                } else {
+                    Alert.alert('Failed!', 'Couldnt add your car, please try again, and make sure your number contains only numbers')
+                }
+            }).catch(err => Alert.alert('Failed!', 'Couldnt add your car, please try again, and make sure your number contains only numbers'))
+
         } else {
             Alert.alert('Failed!', 'Please enter all details, including car picture')
         }

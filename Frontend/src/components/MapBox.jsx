@@ -9,44 +9,11 @@ import { Stack, TextInput, IconButton } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import axios from 'axios'
 import * as http from '../api/HttpClient'
+import { useIsFocused } from '@react-navigation/native';
+import useInterval from '../hooks/useInterval'
 
 export default function MapBox({ navigation }) {
   const [searchInput, setSearchInput] = useState(null)
-  // { // Places around the michlala
-  //     title: "Parking 1",
-  //     price: "20",
-  //     instructions: "Call when reached parking",
-  //     owner: {
-  //       firstName: 'Adam',
-  //       lastName: 'Abraham',
-  //       contact: '0528535752'
-  //     },
-  //     location: 'Rotschild 29 Tel Aviv',
-  //     coordinate: {
-  //       latitude: 31.970186,
-  //       longitude: 34.770633,
-  //       latitudeDelta: 0.01,
-  //       longitudeDelta: 0.01
-  //     },
-  //     imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
-  //   }, {
-  //     title: "Parking 2",
-  //     price: "20",
-  //     instructions: "Call when reached parking",
-  //     owner: {
-  //       firstName: 'Adam',
-  //       lastName: 'Abraham',
-  //       contact: '0528535752'
-  //     },
-  //     location: 'Rotschild 29 Tel Aviv',
-  //     coordinate: {
-  //       latitude: 31.970040,
-  //       longitude: 34.773360,
-  //       latitudeDelta: 0.01,
-  //       longitudeDelta: 0.01
-  //     },
-  //     imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
-  //   }
 
   const [parkings, setParkings] = useState([])
   const mapRef = useRef(null);
@@ -55,9 +22,14 @@ export default function MapBox({ navigation }) {
     updateParkingSpots()
   }, [])
 
+
+  useInterval(() => {
+    updateParkingSpots()
+  }, 2500)
+
   const updateParkingSpots = async () => {
     const parkingSpots = await http.get('parks')
-    
+
     setParkings(parkingSpots)
   }
 

@@ -20,7 +20,7 @@ app.get("/:id", async (req, res, next) => {
   }
 });
 
-app.get("/parkByOwner/:ownerId", async (req, res, next) => {
+app.get("/parkByOwner/:ownerId", async (req, res) => {
   const query = { ownerId: req.params.ownerId };
   const park = await Park.find(query);
   if (!park) {
@@ -57,9 +57,8 @@ app.get("/isAvailable/:id", async (req, res, next) => {
 });
 
 app.post("/create", (req, res) => {
-  console.log(req.body)
-  const newPark = new Park(req.body);
-  console.log(newPark)
+  const newPark = new Park(req.body)
+
   newPark
     .save()
     .then(() => {
@@ -69,8 +68,9 @@ app.post("/create", (req, res) => {
 });
 
 app.put("/edit", async (req, res) => {
-  const { park } = req.body;
+  const park = new Park(req.body);
   const query = { _id: park._id };
+
   const doc = await Park.findOneAndUpdate(query, park, {
     returnOriginal: false,
   });
