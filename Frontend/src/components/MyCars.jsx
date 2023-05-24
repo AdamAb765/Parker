@@ -7,6 +7,7 @@ import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as http from '../api/HttpClient'
 
 export default function MyCars({ navigation, route }) {
     const [isRequestingCars, setIsRequestingCars] = useState(true)
@@ -15,10 +16,9 @@ export default function MyCars({ navigation, route }) {
 
     const fetchFromServer = async () => {
         const user = JSON.parse(await AsyncStorage.getItem('@user'));
-        const allVehicles = await axios.get("http://192.168.148.126:3000/vehicles/vehicleByOwner/" + user.id);
-        setVehicles(allVehicles.data)
-        setUserId(user.id);
-        console.log(allVehicles.data)
+        const allVehicles = await http.get("vehicles/vehicleByOwner/" + user.id);
+
+        setVehicles(allVehicles)
     }
 
     useEffect(() => {

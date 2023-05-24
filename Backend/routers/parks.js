@@ -57,14 +57,15 @@ app.get("/isAvailable/:id", async (req, res, next) => {
 });
 
 app.post("/create", (req, res) => {
-  const newPark = new Park(req.body.park);
+  console.log(req.body)
+  const newPark = new Park(req.body);
+  console.log(newPark)
   newPark
     .save()
     .then(() => {
-      console.log("Successfully added park!");
-      res.send("Added successfully");
+      res.status(200).send("Added successfully");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(404).send("Failed to add parking"));
 });
 
 app.put("/edit", async (req, res) => {

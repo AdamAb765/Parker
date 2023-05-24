@@ -10,12 +10,17 @@ import { CheckBox } from '@rneui/themed'
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as http from '../api/HttpClient'
 
 export default function AddParking({ navigation, route }) {
-    const [useMyLocation, setUseMyLocation] = useState(false)
+    //const [useMyLocation, setUseMyLocation] = useState(false)
     const [titleInput, setTitleInput] = useState('')
     const [instructionInput, setInstructionsInput] = useState('')
     const [locationInput, setLocationInput] = useState('')
+    const [accessibleStartTime, setAccessibleStartTime] = useState('')
+    const [accessibleEndTime, setAccessibleEndTime] = useState('')
+    const [price, setPrice] = useState('')
     const [parkingImage, setParkingImage] = useState(null);
 
     const pickImage = async () => {
@@ -72,15 +77,37 @@ export default function AddParking({ navigation, route }) {
         if (titleInput && instructionInput) {
             let currentLocation
 
-            if (useMyLocation) {
-                currentLocation = await getMyLocation()
-            } else if (locationInput) {
-                currentLocation = await getGeoLocationFromInput()
-            }
+            // if (useMyLocation) {
+            //     currentLocation = await getMyLocation()
+            // } else if (locationInput) {
+
+            currentLocation = await getGeoLocationFromInput()
 
             if (currentLocation && currentLocation.coords) {
-                //try add parking
-                Alert.alert('Success!', 'Parking added successfully')
+                const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
+                const newParking = {
+                    ownerId: userInfo.id,
+                    accessibleStartTime: 'accessibleStartTime',
+                    accessibleEndTime: 'accessibleEndTime',
+                    price: 5,
+                    address: locationInput,
+                    longitude: currentLocation.coords.longitude,
+                    latitude: currentLocation.coords.latitude,
+                    isAvailable: true,
+                    cameraName: '',
+                    cameraPort: 0,
+                    cameraIpAddress: 0
+                }
+
+                http.post('parks/create', newParking).then(res => {
+                    if (res) {
+                        Alert.alert('Success!', 'Parking added successfully')
+                        navigation.goBack(null)
+                    } else {
+                        Alert.alert('Failed!', 'Failed to add parking. Please try again')
+                    }
+                })
+
             } else {
                 Alert.alert('Failed!', `Either this parking spot doesnt exist, or youre not using own location. Please try again`)
             }
@@ -102,6 +129,24 @@ export default function AddParking({ navigation, route }) {
                     <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
                 </View>
             </View>
+            <View style={{ display: 'flex', flexDirection: 'row', width: '90%', height: '10%', justifyContent: 'space-evenly' }}>
+                <TextInput
+                    variant={'outlined'}
+                    editable={false}
+                    label='Parking Start Time'
+                    style={styles.timeText}
+                    value={parkingInfo?.accessibleStartTime}
+                    onChangeText={(newText) => setTitleInput(newText)}
+                />
+                <TextInput
+                    variant={'outlined'}
+                    editable={false}
+                    label='Parking End Time'
+                    style={styles.timeText}
+                    value={parkingInfo?.accessibleEndTime}
+                    onChangeText={(newText) => setTitleInput(newText)}
+                />
+            </View>
             <TextInput
                 placeholder="Parking Title"
                 variant="outlined"
@@ -116,12 +161,12 @@ export default function AddParking({ navigation, route }) {
             />
             <TextInput
                 placeholder="Parking Location"
-                variant={!useMyLocation ? "outlined" : 'filled'}
-                editable={!useMyLocation}
+                variant={'outlined'}
+                //editable={!useMyLocation}
                 style={styles.textInput}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
-            <CheckBox onPress={() => onCheckBoxPress()} checked={useMyLocation} title="Would you like to use your current location?" />
+            {/* <CheckBox onPress={() => onCheckBoxPress()} checked={useMyLocation} title="Would you like to use your current location?" /> */}
             <Button title="Create Parking" color="blue" onPress={onCreateParking} />
         </View>
     );

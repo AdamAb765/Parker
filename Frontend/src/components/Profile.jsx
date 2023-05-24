@@ -105,13 +105,13 @@ export default function Profile({ navigation, route }) {
                 </View>
             </View>
             <View style={styles.body}>
-                <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Edit Profile')}>
+                {/* <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Edit Profile')}>
                     <View style={styles.optionBody}>
                         <Text adjustsFontSizeToFit
                             style={styles.optionText}>Edit Profile</Text>
                         <Icon name="chevron-right" size={24} />
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('My Cars')}>
                     <View style={styles.optionBody}>
                         <Text adjustsFontSizeToFit
