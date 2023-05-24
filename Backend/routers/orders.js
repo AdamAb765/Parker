@@ -1,7 +1,10 @@
 const { Router } = require("express");
 const Order = require("../models/Order");
 const Park = require("../models/Park");
-const { isParkingSpotAvalibale } = require("../common/prakingSpotsBL");
+const {
+  isParkingSpotAvalibale,
+  getCurrLicensePlate,
+} = require("../common/prakingSpotsBL");
 
 const app = Router();
 
@@ -80,12 +83,21 @@ app.put("/finishPark", async (req, res) => {
   const { _id } = req.body;
   const query = { _id: _id };
 
-  const timeEnd = { timeEnd: time() };
-  const doc = await Order.findOneAndUpdate(query, timeEnd, {
-    returnOriginal: false,
-  });
+  const order = await Order.findById(_id);
+  const park = await Park.findById(order.parkId);
 
-  res.json(doc);
+  const serial = await getCurrLicensePlate(park);
+
+  if (!serial || order.vehicleSerial !== parseInt(serial)) {
+    const timeEnd = { timeEnd: time() };
+    const doc = await Order.findOneAndUpdate(query, timeEnd, {
+      returnOriginal: false,
+    });
+
+    res.json(doc);
+  } else {
+    res.status(403).json([]);
+  }
 });
 
 app.put("/edit", async (req, res) => {
