@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Callout } from 'react-native-maps';
 import { Marker } from 'react-native-maps';
-import { StyleSheet, Image, Text, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Image, Text, TouchableOpacity, Alert, Button } from 'react-native';
+import { Switch } from 'react-native-switch';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -11,9 +12,13 @@ import axios from 'axios'
 import * as http from '../api/HttpClient'
 import { useIsFocused } from '@react-navigation/native';
 import useInterval from '../hooks/useInterval'
+import { faPingPongPaddleBall } from '@fortawesome/free-solid-svg-icons';
 
 export default function MapBox({ navigation }) {
   const [searchInput, setSearchInput] = useState(null)
+
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [showMap, setShowMap] = useState(true);
 
   const [parkings, setParkings] = useState([])
   const mapRef = useRef(null);
@@ -33,6 +38,46 @@ export default function MapBox({ navigation }) {
     setParkings(parkingSpots)
   }
 
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance;
+  };
+
+  const toRad = value => (value * Math.PI) / 180;
+
+  const findClosestParkings = () => {
+    if (currentLocation) {
+      const sortedParkings = parkings.sort((parkingA, parkingB) => {
+        const distanceA = calculateDistance(
+          currentLocation.latitude,
+          currentLocation.longitude,
+          parkingA.latitude,
+          parkingA.longitude
+        );
+        const distanceB = calculateDistance(
+          currentLocation.latitude,
+          currentLocation.longitude,
+          parkingB.latitude,
+          parkingB.longitude
+        );
+
+        return distanceA - distanceB;
+      });
+
+      return sortedParkings;
+    }
+    return [];
+  };
+
+  const closestParkings = findClosestParkings();
+
   const getMyLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
@@ -48,15 +93,23 @@ export default function MapBox({ navigation }) {
     return location
   };
 
-  const goToMyLocation = async () => {
-    location = await getMyLocation();
-    if (location && mapRef.current) {
+  const animateToCurrentLocation = () => {
+    if (mapRef.current) {
       mapRef.current.animateToRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01
       });
+    } 
+  }
+
+  const goToMyLocation = async () => {
+    location = await getMyLocation();
+    if (location && mapRef.current) {
+      const { latitude, longitude } = location.coords;
+      setCurrentLocation({ latitude, longitude });
+      animateToCurrentLocation();
     }
   };
 
@@ -66,17 +119,18 @@ export default function MapBox({ navigation }) {
     })();
   }, []);
 
+  const toggleView = () => {
+    setShowMap(!showMap);
+  };
+
   const updateLocation = async () => {
     const searchInputResult = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?&address=${searchInput}&key=AIzaSyCZ-6i7NFhGDzMJl1546n-2EI0laWUc2Hc`)
     const firstSearchResult = searchInputResult.data.results[0]
 
     if (firstSearchResult && firstSearchResult.geometry) {
-      mapRef.current.animateToRegion({
-        latitude: firstSearchResult.geometry.location.lat,
-        longitude: firstSearchResult.geometry.location.lng,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01
-      })
+      const { lat, lng } = firstSearchResult.geometry.location;
+      setCurrentLocation({ latitude: lat, longitude: lng });
+      animateToCurrentLocation();
     } else {
       Alert.alert("Whoops!", "This address doesn't exist. Are you sure it's correct?")
     }
@@ -93,11 +147,30 @@ export default function MapBox({ navigation }) {
           <IconButton onPress={updateLocation} icon={props => <Icon name="eye" {...props} />} {...props} />
         )}
       />
+      <Switch
+          onValueChange={toggleView}
+          style={{marginVertical: -8}}
+          disabled={false}
+          activeText={'Map'}
+          inActiveText={'List'}
+          backgroundActive={'gray'}
+          backgroundInactive={'gray'}
+          circleActiveColor={'#000000'}
+          circleInActiveColor={'#000000'}
+          value={showMap}
+    />
+       {showMap ? (
       <MapView
         ref={mapRef}
         style={styles.map}
         provider={"google"}
-        showsUserLocation
+        showsUserLocation={true}
+        initialRegion={{
+          latitude: currentLocation?.latitude || 0,
+          longitude: currentLocation?.longitude || 0,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01
+        }}
         showsMyLocationButton>
         {parkings.map((marker, index) => (
           <Marker key={index}
@@ -119,6 +192,19 @@ export default function MapBox({ navigation }) {
           </Marker>
         ))}
       </MapView>
+      ) : (
+        <View style={styles.parkingList}>
+          {closestParkings.map((marker, index) => (
+             <TouchableOpacity key={index} onPress={() => navigation.navigate('Parking', { ...marker })} >
+              <View  style={styles.parkingListItem} >
+                <Text style={{ textAlign: 'center',fontSize: 18, fontWeight: 'bold', paddingBottom: 5}}>{marker.title}</Text>
+                <Text>{marker.address}</Text>
+                <Text >{marker.price} ILS Per Hour</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
     </>
   );
 }
@@ -131,5 +217,17 @@ const styles = StyleSheet.create({
   searchInput: {
     width: '80%',
     height: '10%'
+  },
+  parkingList: {
+    width: '95%',
+    height: '80%',
+  },
+  parkingListItem: {
+    marginTop: 5,
+    padding: 8,
+    borderWidth: 2,
+    borderColor: '#20232a',
+    borderRadius: 6,
+    backgroundColor: '#bfd5db',
   }
 });
