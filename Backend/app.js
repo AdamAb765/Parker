@@ -5,12 +5,14 @@ const vehicles = require("./routers/vehicles");
 const users = require("./routers/users");
 const orders = require("./routers/orders");
 
-const db_url = "mongodb://127.0.0.1:27017/parker";
+const db_url = "mongodb://10.10.248.133:21771/parker";
 
-mongoose.connect(db_url, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).catch(error => console.error(error));
+mongoose
+  .connect(db_url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .catch((error) => console.error(error));
 
 const app = express();
 
