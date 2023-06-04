@@ -14,7 +14,7 @@ import { Image } from 'expo-image';
 export default function ParkingHistoryRent({ navigation, route }) {
 
     const calcMoneyMade = () => {
-        return ((Math.abs(route.params.endTime - route.params.startTime) / 36e5) * route.params.price).toFixed(2)
+        return ((Math.abs(new Date(route.params.timeEnd) - new Date(route.params.timeStart)) / 36e5) * route.params.price).toFixed(2)
     }
 
     return (
@@ -24,14 +24,14 @@ export default function ParkingHistoryRent({ navigation, route }) {
                 editable={false}
                 label='Start Time'
                 style={styles.textInput}
-                value={route.params.startTime.toLocaleString()}
+                value={route.params.timeStart.toLocaleString()}
             />
             <TextInput
                 variant={'outlined'}
                 editable={false}
                 style={styles.textInput}
                 label='End Time'
-                value={route.params.endTime.toLocaleString()}
+                value={route.params.timeEnd.toLocaleString()}
             />
             <TextInput
                 variant={'outlined'}

@@ -13,20 +13,21 @@ app.get("/:serial", async (req, res, next) => {
   res.json(vehicle);
 });
 
-app.get("/vehicleByOwner/:ownerId", async (req, res, next) => {
-  const query = { ownerId: req.params.ownerId };
-  const vehicle = await Vehicle.find(query);
-  res.json(vehicle);
+app.get("/vehicleByOwner/:ownerId", async (req, res) => {
+    const query = { ownerId: req.params.ownerId };
+    const vehicle = await Vehicle.find(query);
+    res.json(vehicle);
+  // return res.status(404).send("Vehicles not found");
 });
 
 app.post("/create", (req, res) => {
-  const newVehicle = new Vehicle(req.body.vehicle);
+  const newVehicle = new Vehicle(req.body);
   newVehicle
     .save()
     .then(() => {
-      res.send("Vehicle added successfully");
+      res.status(200).send("Vehicle added successfully");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(404).send('Failed to add vehicle'));
 });
 
 app.put("/edit", async (req, res) => {

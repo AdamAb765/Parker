@@ -7,48 +7,31 @@ import { View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Stack, TextInput, IconButton } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
-import axios from 'axios';
+import axios from 'axios'
+import * as http from '../api/HttpClient'
+import { useIsFocused } from '@react-navigation/native';
+import useInterval from '../hooks/useInterval'
 
 export default function MapBox({ navigation }) {
-  const [myLocation, setMyLocation] = useState(null);
   const [searchInput, setSearchInput] = useState(null)
 
-  const [markers, setMarkers] = useState([{ // Places around the michlala
-    title: "Parking 1",
-    price: "20",
-    instructions: "Call when reached parking",
-    owner: {
-      firstName: 'Adam',
-      lastName: 'Abraham',
-      contact: '0528535752'
-    },
-    location: 'Rotschild 29 Tel Aviv',
-    coordinate: {
-      latitude: 31.970186,
-      longitude: 34.770633,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01
-    },
-    imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
-  }, {
-    title: "Parking 2",
-    price: "20",
-    instructions: "Call when reached parking",
-    owner: {
-      firstName: 'Adam',
-      lastName: 'Abraham',
-      contact: '0528535752'
-    },
-    location: 'Rotschild 29 Tel Aviv',
-    coordinate: {
-      latitude: 31.970040,
-      longitude: 34.773360,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01
-    },
-    imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
-  },])
+  const [parkings, setParkings] = useState([])
   const mapRef = useRef(null);
+
+  useEffect(() => {
+    updateParkingSpots()
+  }, [])
+
+
+  useInterval(() => {
+    updateParkingSpots()
+  }, 2500)
+
+  const updateParkingSpots = async () => {
+    const parkingSpots = await http.get('parks')
+
+    setParkings(parkingSpots)
+  }
 
   const getMyLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -62,7 +45,6 @@ export default function MapBox({ navigation }) {
       timeInterval: 5
     });
 
-    setMyLocation(location);
     return location
   };
 
@@ -83,29 +65,6 @@ export default function MapBox({ navigation }) {
       await goToMyLocation();
     })();
   }, []);
-
-  useEffect(() => {
-    if (myLocation && myLocation.coords.latitude && myLocation.coords.longitude) {
-      setMarkers([...markers, {
-        title: "Parking 3",
-        price: "20",
-        instructions: "Call when reached parking",
-        owner: {
-          firstName: 'Adam',
-          lastName: 'Abraham',
-          contact: '0528535752'
-        },
-        location: 'Rotschild 29 Tel Aviv',
-        coordinate: {
-          latitude: myLocation.coords.latitude,
-          longitude: myLocation.coords.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01
-        },
-        imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170"
-      }])
-    }
-  }, [myLocation])
 
   const updateLocation = async () => {
     const searchInputResult = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?&address=${searchInput}&key=AIzaSyCZ-6i7NFhGDzMJl1546n-2EI0laWUc2Hc`)
@@ -140,16 +99,21 @@ export default function MapBox({ navigation }) {
         provider={"google"}
         showsUserLocation
         showsMyLocationButton>
-        {markers.map((marker, index) => (
+        {parkings.map((marker, index) => (
           <Marker key={index}
-            coordinate={marker.coordinate}
+            coordinate={{
+              latitude: marker.latitude,
+              longitude: marker.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01
+            }}
             icon={require('../../assets/ParkingPin.png')}
           >
             <Callout onPress={() => navigation.navigate('Parking', { ...marker })}>
               <View>
                 <Text>{marker.title}</Text>
                 <Text>{marker.price} ILS Per Hour</Text>
-                <Text>{marker.location}</Text>
+                <Text>{marker.address}</Text>
               </View>
             </Callout>
           </Marker>

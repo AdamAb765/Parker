@@ -2,11 +2,15 @@ const mongoose = require("mongoose");
 
 const ParkSchema = new mongoose.Schema({
     ownerId: Number,
-    accesableHours: String,
+    accessibleStartTime: String,
+    accessibleEndTime: String,
     price: Number,
-    description: String,
+    title: String,
+    instructions: String,
     image: String,
     address: String,
+    longitude: Number,
+    latitude: Number,
     isAvailable: Boolean,
     cameraName: String,
     cameraPort: Number,

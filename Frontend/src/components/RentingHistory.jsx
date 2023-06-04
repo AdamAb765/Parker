@@ -6,46 +6,55 @@ import axios from 'axios';
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
+import * as http from '../api/HttpClient'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RentingHistory({ navigation, route }) {
     const [isRequestingRents, setIsRequestingRents] = useState(true)
     const [rents, setRents] = useState([]);
+    const [activeRent, setActiveRent] = useState([]);
 
     useEffect(() => {
-        //request rents
-        setRents([{
-            title: 'Parking in middle of Tel Aviv',
-            location: 'Rotschild 69 Tel Aviv',
-            renter: {
-                firstName: 'Adam',
-                lastName: 'Abraham',
-                contact: '0528535752'
-            },
-            price: '15',
-            instructions: 'Call when reached the parking',
-            imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170",
-            startTime: new Date(2023, 6, 23),
-            endTime: new Date(),
-        }, {
-            title: 'Parking in middle of Tel Aviv',
-            location: 'Rotschild 69 Tel Aviv',
-            renter: {
-                firstName: 'Adam',
-                lastName: 'Abraham',
-                contact: '0528535752'
-            },
-            price: '15',
-            instructions: 'Call when reached the parking',
-            imageUrl: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170",
-            startTime: new Date(2023, 6, 23),
-            endTime: new Date(),
-        }])
-        setIsRequestingRents(false)
+        updateActiveRent()
+        getRentHistoryForParking()
     }, [])
+
+    const updateActiveRent = async () => {
+        const user = JSON.parse(await AsyncStorage.getItem('@user'));
+        const activeUserRent = await http.get(`orders/byConsumerIsRenting/${user.id}`)
+
+        setActiveRent(activeUserRent)
+    }
+
+    const getRentHistoryForParking = async () => {
+        const user = JSON.parse(await AsyncStorage.getItem('@user'));
+
+        const rentList = await http.get(`orders/orderByConsumer/${user.id}`)
+
+        const rentListWithParking = await Promise.all(rentList.map(async (rent) => {
+            const rentWithParking = await getParkingFromRent(rent)
+
+            return rentWithParking
+        }))
+
+        setRents(rentListWithParking)
+        setIsRequestingRents(false)
+    }
+
+    const getParkingFromRent = async (rent) => {
+        const parkingInfo = await http.get(`parks/${rent.parkId}`)
+
+        return {
+            ...rent,
+            parking: {
+                ...parkingInfo
+            }
+        }
+    }
 
     const countTotalRentMoney = () => {
         return rents.reduce((sum, rent) => {
-            return sum + parseFloat(((Math.abs(rent.endTime - rent.startTime) / 36e5) * rent.price).toFixed(2))
+            return sum + parseFloat(((Math.abs(new Date(rent.timeStart) - new Date(rent.timeEnd)) / 36e5) * rent?.parking?.price).toFixed(2))
         }, 0)
     }
 
@@ -53,7 +62,7 @@ export default function RentingHistory({ navigation, route }) {
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.headerContent}>
-                <View style={styles.statsContainer}>
+                    <View style={styles.statsContainer}>
                         <View style={styles.statsBox}>
                             <Text style={styles.statsLabel}>You can view this parking's history here!</Text>
                         </View>
@@ -61,7 +70,7 @@ export default function RentingHistory({ navigation, route }) {
                             <Text style={styles.moneyLabel}>Total money spent on parkings: {countTotalRentMoney()}</Text>
                         </View>
                         <View style={styles.statsBox}>
-                            <Text style={styles.statusLabel}>Current Status: {route.params ? 'Not Renting' : 'Renting'}!</Text>
+                            <Text style={styles.statusLabel}>Current Status: {activeRent ? 'Renting' : 'Not Renting'}!</Text>
                         </View>
                     </View>
                 </View>
@@ -72,7 +81,7 @@ export default function RentingHistory({ navigation, route }) {
                         <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Renting History Rent', { ...rent })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
-                                    style={styles.optionText}>{rent.endTime.toLocaleDateString()} - {rent.title}</Text>
+                                    style={styles.optionText}>{new Date(rent.timeEnd).toLocaleDateString()} - {rent?.parking?.title}</Text>
                                 <Icon name="chevron-right" size={24} />
                             </View>
                         </TouchableOpacity>
@@ -107,7 +116,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     optionText: {
-        fontSize: '20',
+        fontSize: 20,
         color: '#6a717d',
     },
     header: {

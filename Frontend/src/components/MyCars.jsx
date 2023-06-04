@@ -2,32 +2,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Image, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
-import { get } from 'axios';
+import axios from 'axios';
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button } from '@react-native-material/core';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as http from '../api/HttpClient'
 
 export default function MyCars({ navigation, route }) {
     const [isRequestingCars, setIsRequestingCars] = useState(true)
-    const [cars, setCars] = useState([]);
+    const [userId, setUserId] = useState([]);
+    const [vehicles, setVehicles] = useState([]);
 
-    useEffect(async () => {
-        //request cars
-        const userInfo = JSON.parse(await AsyncStorage.getItem('@userInfo'));
-        const vehicles = get("http://10.100.102.26/vehicles/vehicleByOwner/" + userInfo.id);
-        console.log(vehicles);
-        setCars([{
-            carNumber: '12345678',
-            carName: 'Skoda Fabia',
-            carColor: 'White',
-            imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg"
-        }, {
-            carNumber: '987654321',
-            carName: 'Skoda Fabia',
-            carColor: 'White',
-            imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7d/Skoda_Fabia_IV_IMG_5307.jpg"
-        }])
+    const fetchFromServer = async () => {
+        const user = JSON.parse(await AsyncStorage.getItem('@user'));
+        const allVehicles = await http.get("vehicles/vehicleByOwner/" + user.id);
+
+        setVehicles(allVehicles)
+    }
+
+    useEffect(() => {
+        fetchFromServer();
         setIsRequestingCars(false)
     }, [])
 
@@ -45,11 +40,11 @@ export default function MyCars({ navigation, route }) {
             </View>
             <View style={styles.carsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
-                    {cars.map((car, index) => (
-                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...car })}>
+                    {vehicles.map((vehicle, index) => (
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...vehicle })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
-                                    style={styles.optionText}>{car.carName} - {car.carNumber}</Text>
+                                    style={styles.optionText}>{vehicle.brand} - {vehicle.serial}</Text>
                                 <Icon name="chevron-right" size={24} />
                             </View>
                         </TouchableOpacity>
@@ -84,7 +79,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     optionText: {
-        fontSize: '20',
+        fontSize: 20,
         color: '#6a717d',
     },
     header: {

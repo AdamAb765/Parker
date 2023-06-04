@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const { get } = require("axios");
 const Park = require("../models/Park");
+const { isParkingSpotAvalibale } = require("../common/prakingSpotsBL");
 
 const app = Router();
 
@@ -10,20 +11,24 @@ app.get("/", async (req, res, next) => {
 });
 
 app.get("/:id", async (req, res, next) => {
-  const park = await Park.findById(req.params.id);
-  if (!park) {
-    return res.json([]);
+  if (req.params.id) {
+    const park = await Park.findById(req.params.id);
+    if (!park) {
+      res.json([]);
+    } else {
+      res.json(park);
+    }
   }
-  res.json(park);
 });
 
-app.get("/parkByOwner/:ownerId", async (req, res, next) => {
+app.get("/parkByOwner/:ownerId", async (req, res) => {
   const query = { ownerId: req.params.ownerId };
-  const park = await Park.findOne(query);
+  const park = await Park.find(query);
   if (!park) {
-    return res.json([]);
+    res.json([]);
+  } else {
+    res.json(park);
   }
-  res.json(park);
 });
 
 app.get("/isAvailable/:id", async (req, res, next) => {
@@ -31,37 +36,29 @@ app.get("/isAvailable/:id", async (req, res, next) => {
   if (!park) {
     return res.json([]);
   }
-  const cameraUrl = "http://" + park.cameraIpAddress + ":" +
-    park.cameraPort + "/captureParking/" + park.cameraName;
-  await get(cameraUrl)
-    .then(ans => {
-      console.log(ans.data.results);
-      if (Array.isArray(ans.data.results) && ans.data.results.length) {
-        res.status(200).send(false);
-      } else {
-        res.status(200).send(true);
-      }
 
-    })
-    .catch(err => {
-      console.log(err);
-    })
+  if (await isParkingSpotAvalibale(park)) {
+    res.status(200).send(true);
+  } else {
+    res.status(200).send(false);
+  }
 });
 
 app.post("/create", (req, res) => {
-  const newPark = new Park(req.body.park);
+  const newPark = new Park(req.body)
+
   newPark
     .save()
     .then(() => {
-      console.log("Successfully added park!");
-      res.send("Added successfully");
+      res.status(200).send("Added successfully");
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(404).send("Failed to add parking"));
 });
 
 app.put("/edit", async (req, res) => {
-  const { park } = req.body;
+  const park = new Park(req.body);
   const query = { _id: park._id };
+
   const doc = await Park.findOneAndUpdate(query, park, {
     returnOriginal: false,
   });
@@ -74,16 +71,15 @@ app.put("/setCamera", async (req, res) => {
   const camera = {
     cameraName: req.body.cameraName,
     cameraPort: req.body.cameraPort,
-    cameraIpAddress: req.body.cameraIpAddress
-  }
+    cameraIpAddress: req.body.cameraIpAddress,
+  };
   console.log(camera);
   const doc = await Park.findOneAndUpdate(query, camera, {
     returnOriginal: false,
-    multi: true
+    multi: true,
   });
 
   res.json(doc);
 });
-
 
 module.exports = app;
