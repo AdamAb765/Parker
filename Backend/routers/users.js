@@ -23,7 +23,6 @@ app.get("/byEmail/:email", async (req, res) => {
 
 app.post("/create", (req, res) => {
   console.log(req.body);
-  const { user } = req.body;
   const newUser = new User(req.body);
   newUser
     .save()
@@ -36,7 +35,7 @@ app.post("/create", (req, res) => {
 app.post("/login", async (req, res) => {
   console.log(req.body);
   const { mail, password } = req.body;
-  const query = { mail: mail, password: password }
+  const query = { mail: mail, password: password };
   const user = await User.findOne(query);
   if (!user) {
     res.status(409).send("No such a user");
