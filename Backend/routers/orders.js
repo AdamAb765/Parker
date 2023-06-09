@@ -30,20 +30,20 @@ app.get("/byParkId/:_id", async (req, res, next) => {
 app.get("/byConsumerIsRenting/:consumerId", async (req, res) => {
   const query = {
     consumerId: req.params.consumerId,
-    timeEnd: ""
+    timeEnd: "",
   };
 
-  let order
+  let order;
   try {
     order = await Order.findOne(query);
   } catch {
-    order = null
+    order = null;
   }
 
   if (order) {
-    res.json(order)
+    res.json(order);
   } else {
-    res.json(false)
+    res.json(false);
   }
 });
 
@@ -97,6 +97,16 @@ app.post("/create", async (req, res) => {
   } else {
     res.status(403).send("The parking spot already taken");
   }
+});
+
+app.post("/createMany", async (req, res) => {
+  // const newOrder = new Order({ ...req.body, ...initialOrder });
+  const orders = req.body;
+  Order.insertMany(orders)
+    .then(() => {
+      res.status(200).send("Documented successfully");
+    })
+    .catch((err) => console.log(err));
 });
 
 app.put("/finishPark", async (req, res) => {

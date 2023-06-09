@@ -45,10 +45,18 @@ app.get("/isAvailable/:id", async (req, res, next) => {
 });
 
 app.post("/create", (req, res) => {
-  const newPark = new Park(req.body)
-
+  const newPark = new Park(req.body);
   newPark
     .save()
+    .then(() => {
+      res.status(200).send("Added successfully");
+    })
+    .catch((err) => res.status(404).send("Failed to add parking"));
+});
+
+app.post("/createMany", (req, res) => {
+  const parks = req.body;
+  Park.insertMany(parks)
     .then(() => {
       res.status(200).send("Added successfully");
     })
