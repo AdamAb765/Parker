@@ -33,9 +33,16 @@ namespace parkingSpotHandler
 
             CameraComboBox.ItemsSource = ServiceManager.GetConnectedCameras().ToList();
             ParkingComboBox.ItemsSource = ServiceManager.GetUserParkingSpots(id).ToList();
+            try
+            {
 
-            CameraComboBox.SelectedItem = CameraComboBox.Items[0];
-            ParkingComboBox.SelectedItem = ParkingComboBox.Items[0];
+                CameraComboBox.SelectedItem = CameraComboBox.Items[0];
+                ParkingComboBox.SelectedItem = ParkingComboBox.Items[0];
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         private void RestartBtn_Click(object sender, RoutedEventArgs e)
@@ -45,7 +52,7 @@ namespace parkingSpotHandler
 
         private void AddParkingBtn_Click(object sender, RoutedEventArgs e)
         {
-            addCameraSection.Visibility = addCameraSection.Visibility == Visibility.Visible ? Visibility.Collapsed:
+            addCameraSection.Visibility = addCameraSection.Visibility == Visibility.Visible ? Visibility.Collapsed :
                                                                                               Visibility.Visible;
         }
 

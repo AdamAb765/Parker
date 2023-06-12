@@ -1,7 +1,7 @@
 const express = require("express");
 const ffmpeg = require("fluent-ffmpeg");
 const { uuid } = require("uuidv4");
-const path = require('path');
+const path = require("path");
 
 const resourcesFolder = "resources";
 const ffmpegPath = path.join(__dirname, `${resourcesFolder}\\ffmpeg.exe`);
@@ -31,18 +31,38 @@ app.get("/captureParking/:cameraName", async (req, res) => {
   else res.status(503).send("couldnt parse photo");
 });
 
+const captureParkingInterval = (cameraName) => {
+  setInterval(async () => {
+    console.log("print here the result of the interval");
+    const fileName = await captureParking(cameraName);
+    const readPhotoResult = await readPhoto(fileName);
+
+    if (readPhotoResult) {
+      console.log(
+        "Photo captured and parsed successfully :" +
+          JSON.stringify(readPhotoResult)
+      );
+    } else {
+      console.log("Failed to parse photo");
+    }
+  }, 5 * 60 * 1000); // Interval set to 10 minutes in milliseconds
+};
+
 const captureParking = (cameraName) => {
   var dir = path.join(__dirname, `${outputFolder}/${cameraName}`);
 
-  if (!fs.existsSync(dir)){
-      fs.mkdirSync(dir);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
   }
 
-  const fileName = path.join(__dirname, `${outputFolder}/${cameraName}/${outputImagePrefix}${uuid()}${outputSuffix}`);
+  const fileName = path.join(
+    __dirname,
+    `${outputFolder}/${cameraName}/${outputImagePrefix}${uuid()}${outputSuffix}`
+  );
 
   return new Promise((resolve, reject) => {
-    const command = ffmpeg()  
-    .input(`video=${cameraName}`)
+    const command = ffmpeg()
+      .input(`video=${cameraName}`)
       .inputFormat("dshow")
       .frames(1)
       .output(fileName)
@@ -57,7 +77,6 @@ const captureParking = (cameraName) => {
     command.run();
   });
 };
-
 
 const readPhoto = async (fileName) => {
   let body = new FormData();
@@ -86,6 +105,10 @@ const readPhoto = async (fileName) => {
 const args = process.argv.slice(2);
 
 const port = args[0];
+const cameraName = args[1];
+
+captureParkingInterval(cameraName);
+
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
