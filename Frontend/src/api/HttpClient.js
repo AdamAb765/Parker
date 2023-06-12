@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const SERVER_IP = "http://10.100.102.6";
+const SERVER_IP = "http://10.100.102.26";
 const SERVER_PORT = "3000";
 const REQUEST_SUCESS_STATUS = 200;
 

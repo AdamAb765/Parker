@@ -177,10 +177,10 @@ export default function Profile({ navigation, route }) {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option} onPress={() => signOut(auth)}>
+        <TouchableOpacity style={{...styles.option, marginTop: 30}} onPress={() => signOut(auth)}>
           <View style={styles.optionBody}>
             <Text adjustsFontSizeToFit style={styles.logOutText}>
-              LogOut
+              Log Out
             </Text>
             <Icon name="chevron-right" size={24} />
           </View>
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     color: "#6a717d",
   },
   logOutText: {
-    fontSize: 26,
+    fontSize: 22,
     color: "#ff0000",
   },
   header: {

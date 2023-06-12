@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Callout } from 'react-native-maps';
 import { Marker } from 'react-native-maps';
-import { StyleSheet, Image, Text, TouchableOpacity, Alert, Button } from 'react-native';
+import { StyleSheet, Image, Text, TouchableOpacity, Alert } from 'react-native';
 import { Switch } from 'react-native-switch';
 import * as Location from 'expo-location'
 import { View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Stack, TextInput, IconButton } from "@react-native-material/core";
+import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
 import axios from 'axios'
 import * as http from '../api/HttpClient'
@@ -94,7 +94,7 @@ export default function MapBox({ navigation }) {
   };
 
   const animateToCurrentLocation = () => {
-    if (mapRef.current) {
+    if (mapRef.current && currentLocation) {
       mapRef.current.animateToRegion({
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
@@ -114,6 +114,10 @@ export default function MapBox({ navigation }) {
   };
 
   useEffect(() => {
+    animateToCurrentLocation()
+  }, [currentLocation])
+
+  useEffect(() => {
     (async () => {
       await goToMyLocation();
     })();
@@ -130,7 +134,6 @@ export default function MapBox({ navigation }) {
     if (firstSearchResult && firstSearchResult.geometry) {
       const { lat, lng } = firstSearchResult.geometry.location;
       setCurrentLocation({ latitude: lat, longitude: lng });
-      animateToCurrentLocation();
     } else {
       Alert.alert("Whoops!", "This address doesn't exist. Are you sure it's correct?")
     }
@@ -138,6 +141,7 @@ export default function MapBox({ navigation }) {
 
   return (
     <>
+    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width:'92%', height: '10%' }}>
       <TextInput
         placeholder="Where would you like to park?"
         variant="outlined"
@@ -147,9 +151,9 @@ export default function MapBox({ navigation }) {
           <IconButton onPress={updateLocation} icon={props => <Icon name="eye" {...props} />} {...props} />
         )}
       />
+      <View style={{paddingTop: 12}}>
       <Switch
           onValueChange={toggleView}
-          style={{marginVertical: -8}}
           disabled={false}
           activeText={'Map'}
           inActiveText={'List'}
@@ -158,8 +162,11 @@ export default function MapBox({ navigation }) {
           circleActiveColor={'#000000'}
           circleInActiveColor={'#000000'}
           value={showMap}
-    />
+      />
+    </View>
+    </View>
        {showMap ? (
+        <View style={{width: '100%', height: '80%', position: 'relative'}}>
       <MapView
         ref={mapRef}
         style={styles.map}
@@ -171,7 +178,7 @@ export default function MapBox({ navigation }) {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01
         }}
-        showsMyLocationButton>
+        >
         {parkings.map((marker, index) => (
           <Marker key={index}
             coordinate={{
@@ -192,6 +199,9 @@ export default function MapBox({ navigation }) {
           </Marker>
         ))}
       </MapView>
+      <IconButton  style={{position: 'absolute', zIndex: 999, bottom: 20, right: 20, width: '15%', backgroundColor: 'white', borderWidth: 1}} onPress={goToMyLocation} 
+      icon={props => <Icon size={40} name="target"/>} />
+      </View>
       ) : (
         <View style={styles.parkingList}>
           {closestParkings.map((marker, index) => (
@@ -212,7 +222,7 @@ export default function MapBox({ navigation }) {
 const styles = StyleSheet.create({
   map: {
     width: '100%',
-    height: '80%',
+    height: '100%',
   },
   searchInput: {
     width: '80%',
@@ -229,5 +239,5 @@ const styles = StyleSheet.create({
     borderColor: '#20232a',
     borderRadius: 6,
     backgroundColor: '#bfd5db',
-  }
+  },
 });
