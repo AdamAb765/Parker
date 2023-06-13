@@ -111,20 +111,15 @@ app.post("/createMany", async (req, res) => {
 
 app.put("/finishPark", async (req, res) => {
   const { _id } = req.body;
-  const query = { _id: _id };
 
   const order = await Order.findById(_id);
   const park = await Park.findById(order.parkId);
 
-  const serial = await getCurrLicensePlate(park);
+  if (park.currentParkingCar != order.vehicleSerial && !order.isFinished) {
+    order.timeEnd = new Date().toISOString()
+    order.save()
 
-  if (!serial || order.vehicleSerial !== parseInt(serial)) {
-    const timeEnd = { timeEnd: time() };
-    const doc = await Order.findOneAndUpdate(query, timeEnd, {
-      returnOriginal: false,
-    });
-
-    res.json(doc);
+    res.json(order);
   } else {
     res.status(403).json([]);
   }
@@ -140,6 +135,23 @@ app.put("/edit", async (req, res) => {
 
   res.json(doc);
 });
+
+setInterval(async () => {
+  const query = { isFinished: false }
+  const allOpenOrders = await Order.find(query);
+
+  allOpenOrders.forEach(async (order) => {
+    const accordingParking = await Park.findOne({_id: order.parkId})
+    const timeNow = new Date()
+
+    if(accordingParking.currentParkingCar != order.vehicleSerial &&
+       order.timeEnd && new Date(order.timeEnd) < timeNow) {
+        order.isFinished = true
+        order.timeEnd = timeNow.toISOString()
+        order.save()
+       }
+  })
+}, 0.1 * 60 * 1000)
 
 const time = () => {
   let dateObject = new Date();

@@ -210,6 +210,7 @@ export default function MapBox({ navigation }) {
                 <Text style={{ textAlign: 'center',fontSize: 18, fontWeight: 'bold', paddingBottom: 5}}>{marker.title}</Text>
                 <Text>{marker.address}</Text>
                 <Text >{marker.price} ILS Per Hour</Text>
+                <Text >Distance: {calculateDistance(currentLocation.latitude, currentLocation.longitude, marker.latitude, marker.longitude).toFixed(2)} KM</Text>
               </View>
             </TouchableOpacity>
           ))}

@@ -2,8 +2,6 @@ const mongoose = require("mongoose");
 
 const ParkSchema = new mongoose.Schema({
     ownerId: Number,
-    accessibleStartTime: String,
-    accessibleEndTime: String,
     price: Number,
     title: String,
     instructions: String,
@@ -12,9 +10,24 @@ const ParkSchema = new mongoose.Schema({
     longitude: Number,
     latitude: Number,
     isAvailable: Boolean,
+    currentParkingCar: Number,
     cameraName: String,
     cameraPort: Number,
-    cameraIpAddress: String
+    cameraIpAddress: String,
+    accessibleStartTimeSun: String,
+    accessibleEndTimeSun: String,
+    accessibleStartTimeMon: String,
+    accessibleEndTimeMon: String,
+    accessibleStartTimeTue: String,
+    accessibleEndTimeTue: String,
+    accessibleStartTimeWed: String,
+    accessibleEndTimeWed: String,
+    accessibleStartTimeThu: String,
+    accessibleEndTimeThu: String,
+    accessibleStartTimeFri: String,
+    accessibleEndTimeFri: String,
+    accessibleStartTimeSat: String,
+    accessibleEndTimeSat: String,
 });
 
 module.exports = new mongoose.model("Park", ParkSchema);

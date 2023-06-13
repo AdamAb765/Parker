@@ -125,7 +125,7 @@ export default function Profile({ navigation, route }) {
               uri: "https://bootdey.com/img/Content/avatar/avatar1.png",
             }}
           />
-          <Text style={styles.name}>{getUserDisplayName2()}</Text>
+          <Text style={styles.name}>{auth.currentUser?.displayName}</Text>
           <View style={styles.statsContainer}>
             <View style={styles.statsBox}>
               <Text style={styles.statsLabel}>
