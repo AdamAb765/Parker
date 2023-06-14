@@ -47,7 +47,9 @@ namespace parkingSpotHandler
 
         private void RestartBtn_Click(object sender, RoutedEventArgs e)
         {
-            ServiceManager.RestartCaptureService();
+            string cameraName = CameraComboBox.SelectedItem.ToString();
+            string parkingId = (ParkingComboBox.SelectedItem as ParkingSpotModel).Id;
+            ServiceManager.RestartCaptureService(cameraName, parkingId);
         }
 
         private void AddParkingBtn_Click(object sender, RoutedEventArgs e)
@@ -67,9 +69,9 @@ namespace parkingSpotHandler
 
             capture.ParkingId = m_UserId;
             capture.Ip = ServiceManager.GetMachineIp();
-            capture.Port = ServiceManager.StartCapureServer();
             capture.CameraName = CameraComboBox.SelectedItem.ToString();
             capture.ParkingId = (ParkingComboBox.SelectedItem as ParkingSpotModel).Id;
+            capture.Port = ServiceManager.StartCapureServer(capture.CameraName, capture.ParkingId);
 
             if (!ServiceManager.UpdateParkingCamera(capture))
             {

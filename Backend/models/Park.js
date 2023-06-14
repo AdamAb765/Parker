@@ -1,20 +1,22 @@
 const mongoose = require("mongoose");
 
 const ParkSchema = new mongoose.Schema({
-    ownerId: Number,
-    accessibleStartTime: String,
-    accessibleEndTime: String,
-    price: Number,
-    title: String,
-    instructions: String,
-    image: String,
-    address: String,
-    longitude: Number,
-    latitude: Number,
-    isAvailable: Boolean,
-    cameraName: String,
-    cameraPort: Number,
-    cameraIpAddress: String
+  ownerId: Number,
+  accessibleStartTime: String,
+  accessibleEndTime: String,
+  price: Number,
+  title: String,
+  instructions: String,
+  image: String,
+  address: String,
+  longitude: Number,
+  latitude: Number,
+  isAvailable: Boolean,
+  cameraName: String,
+  cameraPort: Number,
+  cameraIpAddress: String,
+  lastCameraRecord: String,
+  currentParkingCar: String,
 });
 
 module.exports = new mongoose.model("Park", ParkSchema);

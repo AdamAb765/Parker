@@ -5,7 +5,8 @@ const vehicles = require("./routers/vehicles");
 const users = require("./routers/users");
 const orders = require("./routers/orders");
 
-const db_url = "mongodb://10.10.248.133:21771/parker";
+//const db_url = "mongodb://10.10.248.133:21771/parker";
+const db_url = "mongodb://localhost:27017/parker";
 
 mongoose
   .connect(db_url, {

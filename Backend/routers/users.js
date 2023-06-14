@@ -34,8 +34,8 @@ app.post("/create", (req, res) => {
 
 app.post("/login", async (req, res) => {
   console.log(req.body);
-  const { mail, password } = req.body;
-  const query = { mail: mail, password: password };
+  const { email, password } = req.body;
+  const query = { email: email, password: password };
   const user = await User.findOne(query);
   if (!user) {
     res.status(409).send("No such a user");

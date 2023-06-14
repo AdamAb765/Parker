@@ -74,6 +74,23 @@ app.put("/edit", async (req, res) => {
   res.json(doc);
 });
 
+app.put("/:id", async (req, res) => {
+  console.log(req.body);
+  const { licensePlate, pictureDateTime } = req.body;
+
+  const park = await Park.findById(req.params.id);
+  if (!park) {
+    res.status(404).send("parking spot not found");
+  }
+
+  park.currentParkingCar = licensePlate;
+  park.lastCameraRecord = pictureDateTime;
+  park.isAvailable = licensePlate ? false : true;
+
+  const updatedParking = await park.save();
+  res.status(200).send(updatedParking);
+});
+
 app.put("/setCamera", async (req, res) => {
   const query = { _id: req.body.parkId };
   const camera = {
