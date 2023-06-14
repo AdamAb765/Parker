@@ -46,6 +46,7 @@ export default function AddCar({ navigation, route }) {
 
             http.post('vehicles/create', carToAdd).then(res => {
                 if (res) {
+                    route.params.updateCars()
                     Alert.alert('Success!', 'Car added successfully')
                     navigation.goBack(null)
                 } else {

@@ -77,6 +77,7 @@ export default function AddParking({ navigation, route }) {
 
                 http.post('parks/create', newParking).then(res => {
                     if (res) {
+                        route.params.getMyParkingSpots()
                         Alert.alert('Success!', 'Parking added successfully')
                         navigation.goBack(null)
                     } else {

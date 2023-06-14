@@ -92,6 +92,7 @@ export default function MyParking({ navigation, route }) {
 
                 http.put('parks/edit', editedParking).then(res => {
                     if (res) {
+                        route.params.getMyParkingSpots()
                         Alert.alert('Success!', 'Parking edited successfully')
                         navigation.goBack(null)
                     } else {
