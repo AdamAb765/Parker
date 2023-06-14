@@ -11,10 +11,9 @@ import * as http from '../api/HttpClient'
 
 export default function MyCars({ navigation, route }) {
     const [isRequestingCars, setIsRequestingCars] = useState(true)
-    const [userId, setUserId] = useState([]);
     const [vehicles, setVehicles] = useState([]);
 
-    const fetchFromServer = async () => {
+    const updateCars = async () => {
         const user = JSON.parse(await AsyncStorage.getItem('@user'));
         const allVehicles = await http.get("vehicles/vehicleByOwner/" + user.id);
 
@@ -22,7 +21,7 @@ export default function MyCars({ navigation, route }) {
     }
 
     useEffect(() => {
-        fetchFromServer();
+        updateCars();
         setIsRequestingCars(false)
     }, [])
 
@@ -34,14 +33,14 @@ export default function MyCars({ navigation, route }) {
                         <View style={styles.statsBox}>
                             <Text style={styles.statsLabel}>You can add and edit your vehicles here!</Text>
                         </View>
-                        <Button title="Add Car" color='blue' style={styles.addBtn} onPress={() => navigation.navigate('Add Car')} />
+                        <Button title="Add Car" color='blue' style={styles.addBtn} onPress={() => navigation.navigate('Add Car', { updateCars })} />
                     </View>
                 </View>
             </View>
             <View style={styles.carsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
                     {vehicles.map((vehicle, index) => (
-                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...vehicle })}>
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Car', { ...vehicle, updateCars })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
                                     style={styles.optionText}>{vehicle.brand} - {vehicle.serial}</Text>

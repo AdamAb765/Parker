@@ -22,6 +22,8 @@ import { auth } from "./firebase";
 import ParkingHistoryList from "./src/components/ParkingHistoryList";
 import ParkingHistoryRent from "./src/components/ParkingHistoryRent";
 import RentingHistoryRent from "./src/components/RentingHistoryRent";
+import ParkingSchedule from "./src/components/ParkingSchedule";
+import AddParkingSchedule from "./src/components/AddParkingSchedule";
 
 function HomeScreen({ navigation }) {
   return (
@@ -59,6 +61,7 @@ export default function App() {
           component={HomeScreen}
         />
         <HomeStack.Screen name="Parking" component={Parking} />
+        <HomeStack.Screen name="Parking Schedule" component={ParkingSchedule} />
       </HomeStack.Navigator>
     );
   }
@@ -75,6 +78,7 @@ export default function App() {
         <ProfileStack.Screen name="My Cars" component={MyCars} />
         <ProfileStack.Screen name="Add Car" component={AddCar} />
         <ProfileStack.Screen name="Add Parking" component={AddParking} />
+        <ProfileStack.Screen name="Add Parking Schedule" component={AddParkingSchedule} />
         <ProfileStack.Screen
           name="My Parking Spots"
           component={MyParkingSpots}

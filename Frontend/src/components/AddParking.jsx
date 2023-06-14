@@ -14,10 +14,9 @@ export default function AddParking({ navigation, route }) {
     const [titleInput, setTitleInput] = useState('')
     const [instructionInput, setInstructionsInput] = useState('')
     const [locationInput, setLocationInput] = useState('')
-    const [accessibleStartTime, setAccessibleStartTime] = useState(new Date())
-    const [accessibleEndTime, setAccessibleEndTime] = useState(new Date())
     const [price, setPrice] = useState(0)
     const [parkingImage, setParkingImage] = useState(null);
+    const [parkingSchedule, setParkingSchedule] = useState(null)
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -51,13 +50,9 @@ export default function AddParking({ navigation, route }) {
     }
 
     const onCreateParking = async () => {
-        if (titleInput && instructionInput && accessibleStartTime && accessibleEndTime &&
-            (price != 0) && locationInput && parkingImage) {
+        if (titleInput && instructionInput && (price != 0) && 
+            locationInput && parkingImage && parkingSchedule) {
             let currentLocation
-
-            // if (useMyLocation) {
-            //     currentLocation = await getMyLocation()
-            // } else if (locationInput) {
 
             currentLocation = await getGeoLocationFromInput()
 
@@ -68,8 +63,6 @@ export default function AddParking({ navigation, route }) {
                     ownerId: userInfo.id,
                     title: titleInput,
                     instructions: instructionInput,
-                    accessibleStartTime: accessibleStartTime.toLocaleTimeString(),
-                    accessibleEndTime: accessibleEndTime.toLocaleTimeString(),
                     price: price,
                     address: locationInput,
                     image: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170",
@@ -78,11 +71,13 @@ export default function AddParking({ navigation, route }) {
                     isAvailable: true,
                     cameraName: '',
                     cameraPort: 0,
-                    cameraIpAddress: 0
+                    cameraIpAddress: 0,
+                    ...parkingSchedule
                 }
 
                 http.post('parks/create', newParking).then(res => {
                     if (res) {
+                        route.params.getMyParkingSpots()
                         Alert.alert('Success!', 'Parking added successfully')
                         navigation.goBack(null)
                     } else {
@@ -93,7 +88,7 @@ export default function AddParking({ navigation, route }) {
                 Alert.alert('Failed!', `Either this parking spot doesnt exist, or youre not using own location. Please try again`)
             }
         } else {
-            Alert.alert('Failed!', 'Please make sure you filled all the fields, times, price and picture')
+            Alert.alert('Failed!', 'Please make sure you filled all the fields, price, picture, and added a parking schedule')
         }
     }
 
@@ -110,20 +105,7 @@ export default function AddParking({ navigation, route }) {
                     <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
                 </View>
             </View>
-            <View style={{ display: 'flex', flexDirection: 'row', width: '65%', height: '10%', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <Text>Start:</Text>
-                <RNDateTimePicker
-                    mode="time"
-                    value={accessibleStartTime}
-                    is24Hour={true}
-                    onChange={(e, newDate) => { setAccessibleStartTime(newDate) }} />
-                <Text style={{ marginLeft: 50 }}>End:</Text>
-                <RNDateTimePicker
-                    mode="time"
-                    value={accessibleEndTime}
-                    is24Hour={true}
-                    onChange={(e, newDate) => { setAccessibleEndTime(newDate) }} />
-            </View>
+            <Button color="orange" style={{marginTop: 15, marginBottom: 15}} title="Add Parking Schedule" onPress={() => navigation.navigate('Add Parking Schedule', {parkingSchedule, setParkingSchedule})}/>
 
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '70%', justifyContent: 'space-evenly', marginBottom: 10 }}>
                 <Text>Price:</Text>

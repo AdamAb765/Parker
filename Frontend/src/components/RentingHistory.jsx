@@ -15,7 +15,6 @@ export default function RentingHistory({ navigation, route }) {
     const [activeRent, setActiveRent] = useState([]);
 
     useEffect(() => {
-        updateActiveRent()
         getRentHistoryForParking()
     }, [])
 
@@ -55,7 +54,7 @@ export default function RentingHistory({ navigation, route }) {
     const countTotalRentMoney = () => {
         return rents.reduce((sum, rent) => {
             return sum + parseFloat(((Math.abs(new Date(rent.timeStart) - new Date(rent.timeEnd)) / 36e5) * rent?.parking?.price).toFixed(2))
-        }, 0)
+        }, 0).toFixed(2)
     }
 
     return (
@@ -64,13 +63,10 @@ export default function RentingHistory({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <View style={styles.statsContainer}>
                         <View style={styles.statsBox}>
-                            <Text style={styles.statsLabel}>You can view this parking's history here!</Text>
+                            <Text style={styles.statsLabel}>You can view your rent history here!</Text>
                         </View>
                         <View style={styles.statsBox}>
                             <Text style={styles.moneyLabel}>Total money spent on parkings: {countTotalRentMoney()}</Text>
-                        </View>
-                        <View style={styles.statsBox}>
-                            <Text style={styles.statusLabel}>Current Status: {activeRent ? 'Renting' : 'Not Renting'}!</Text>
                         </View>
                     </View>
                 </View>
@@ -78,7 +74,7 @@ export default function RentingHistory({ navigation, route }) {
             <View style={styles.carsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
                     {rents.map((rent, index) => (
-                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Renting History Rent', { ...rent })}>
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Renting History Rent', { ...rent, getRentHistoryForParking })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
                                     style={styles.optionText}>{new Date(rent.timeEnd).toLocaleDateString()} - {rent?.parking?.title}</Text>
