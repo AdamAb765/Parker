@@ -38,14 +38,14 @@ export default function MyParkingSpots({ navigation, route }) {
                         <View style={styles.statsBox}>
                             <Text style={styles.statsLabel}>You can add and edit your parkings here!</Text>
                         </View>
-                        <Button title="Add Parking" color='blue' style={styles.addBtn} onPress={() => navigation.navigate('Add Parking')} />
+                        <Button title="Add Parking" color='blue' style={styles.addBtn} onPress={() => navigation.navigate('Add Parking', { getMyParkingSpots })} />
                     </View>
                 </View>
             </View>
             <View style={styles.parkingsHolder}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
                     {myParkingSpots.map((parkingSpot, index) => (
-                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('My Parking', { ...parkingSpot })}>
+                        <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('My Parking', { ...parkingSpot, getMyParkingSpots })}>
                             <View style={styles.optionBody}>
                                 <Text adjustsFontSizeToFit
                                     style={styles.optionText}>{parkingSpot.title}</Text>

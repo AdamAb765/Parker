@@ -7,6 +7,7 @@ const OrderSchema = new mongoose.Schema({
     vehicleSerial: Number,
     timeStart: String,
     timeEnd: String,
+    isFinished: Boolean
     // Add here if its over the hours 
 });
 

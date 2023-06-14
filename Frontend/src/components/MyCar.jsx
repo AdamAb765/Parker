@@ -8,12 +8,13 @@ import { StatusBar } from 'expo-status-bar';
 import { Button, TextInput } from "@react-native-material/core";
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
+import * as http from '../api/HttpClient'
 
 export default function MyCar({ navigation, route }) {
     const [carName, setCarName] = useState(route.params.brand)
     const [carColor, setColor] = useState(route.params.color)
     const [carNumber, setCarNumber] = useState(route.params.serial)
-    const [carImage, setCarImage] = useState(route.params.imageUrl);
+    const [carImage, setCarImage] = useState(route.params.image);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -28,10 +29,16 @@ export default function MyCar({ navigation, route }) {
         }
     };
 
-    const onEditCar = () => {
+    const onEditCar = async () => {
         if (carName && carImage && carNumber && carColor) {
+            await http.put("vehicles/edit", {
+                serial: carNumber,
+                color: carColor,
+                brand: carName,
+                image: carImage
+            })
+            route.params.updateCars()
             Alert.alert('Success!', 'Car info edited successfully')
-            //try add to db
             navigation.goBack()
         } else {
             Alert.alert('Failed!', 'Please enter all details, including car picture')
@@ -40,7 +47,7 @@ export default function MyCar({ navigation, route }) {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity  style={styles.carImageHolder} onPress={pickImage}>
+            <TouchableOpacity style={styles.carImageHolder} onPress={pickImage}>
                 <Image style={styles.carImage}
                     source={carImage}
                     contentFit='fill'

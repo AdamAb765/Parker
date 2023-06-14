@@ -17,8 +17,6 @@ export default function Parking({ navigation, route }) {
     const [userRent, setUserRent] = useState(false)
     const [isUsersParking, setIsUsersParking] = useState(false)
     const [userCars, setUserCars] = useState([])
-    const [isCarsDropdownOpen, setIsCarsDropdownOpen] = useState(false);
-    const [chosenCar, setChosenCar] = useState(null);
 
     useEffect(() => {
         getParkingInfo()
@@ -42,57 +40,13 @@ export default function Parking({ navigation, route }) {
         setParkingInfo(parkingInfo)
     }
 
-    const isTimeAllowed = () => {
-        const now = new Date()
-        const regex = new RegExp(':', 'g')
-
-        return parseInt(now.toLocaleTimeString().replace(regex, ''), 10) > parseInt(parkingInfo?.accessibleStartTime.replace(regex, ''), 10) &&
-            parseInt(now.toLocaleTimeString().replace(regex, ''), 10) < parseInt(parkingInfo?.accessibleEndTime.replace(regex, ''), 10)
-    }
-
     const endRentParking = async () => {
         await http.put(`orders/finishPark`, { ...userRent }).then(res => {
             if (res) {
                 Alert.alert('Success!', 'Rent ended successfully')
                 navigation.goBack(null)
             } else {
-                Alert.alert('Failed!', `Couldnt stop renting. Please try again`)
-            }
-        })
-    }
-
-    const onRentParking = async () => {
-        const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
-
-        if (chosenCar) {
-
-            const newOrder = {
-                parkId: route.params._id,
-                consumerId: userInfo.id,
-                vehicleSerial: chosenCar,
-                timeStart: new Date(),
-                payment: 0
-            }
-
-            http.post(`orders/create`, newOrder)
-                .then(res => {
-                    if (res) {
-                        Alert.alert('Success!', 'Parking rented successfully')
-                        navigation.goBack(null)
-                    } else {
-                        Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
-                    }
-                })
-        } else {
-            Alert.alert('Parking Failed!', `Please choose a car for parking. If you dont have any, please add one in your profile`)
-        }
-    }
-
-    const createDropDownValues = () => {
-        return userCars.map(car => {
-            return {
-                label: `${car.serial} ${car.color} ${car.brand}`,
-                value: car.serial
+                Alert.alert('Failed!', `Couldnt stop renting. Please leave parking with your car and try again`)
             }
         })
     }
@@ -103,27 +57,9 @@ export default function Parking({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <Image style={styles.avatar}
                         contentFit='contain'
-                        source={route.params.image}
+                        source={route.params?.image}
                         placeholder={require("../../assets/listing_parking_placeholder.png")} />
                 </View>
-            </View>
-            <View style={{ display: 'flex', flexDirection: 'row', width: '90%', height: '10%', justifyContent: 'space-evenly' }}>
-                <TextInput
-                    variant={'outlined'}
-                    editable={false}
-                    label='Parking Start Time'
-                    style={styles.timeText}
-                    value={parkingInfo?.accessibleStartTime}
-                    onChangeText={(newText) => setTitleInput(newText)}
-                />
-                <TextInput
-                    variant={'outlined'}
-                    editable={false}
-                    label='Parking End Time'
-                    style={styles.timeText}
-                    value={parkingInfo?.accessibleEndTime}
-                    onChangeText={(newText) => setTitleInput(newText)}
-                />
             </View>
             <View style={{ display: 'flex', flexDirection: 'column', width: '90%', height: '34%', alignSelf: 'center', justifyContent: 'space-between' }}>
                 <TextInput
@@ -164,37 +100,13 @@ export default function Parking({ navigation, route }) {
                     (parkingInfo?.isAvailable ?
                         <Text>Your parking is currently unoccupied!</Text>
                         :
-                        <Text>Your parking is currently occupied</Text>)
+                        <Text>Your parking is currently occupied by car {parkingInfo?.currentParkingCar}</Text>)
                     :
-                    parkingInfo?.isAvailable && isTimeAllowed() && !userRent ?
-                        <>
-                            <DropDownPicker
-                                style={styles.dropdown}
-                                open={isCarsDropdownOpen}
-                                value={chosenCar}
-                                items={createDropDownValues()}
-                                setOpen={setIsCarsDropdownOpen}
-                                setValue={setChosenCar}
-                                setItems={setUserCars}
-                                placeholder="Select Your Car"
-                                placeholderStyle={styles.placeholderStyles}
-                                zIndex={3000}
-                                zIndexInverse={1000}
-                            />
-                            <Button title="Rent Parking" color="blue" style={styles.btn} onPress={onRentParking} />
-                        </>
+                    !userRent ?
+                        <Button title="View Schedule" color="blue" style={styles.btn} onPress={() => navigation.navigate('Parking Schedule', {...route.params, ...parkingInfo, userCars})} />
                         :
-                        userRent ?
-                            <Button title="End Parking" color="red" style={styles.btn} onPress={endRentParking} />
-                            :
-                            <Text>Parking is currently occupied or unusuable!</Text>}
-                {/* {userRent ? <Button title="End Parking" color="red" onPress={endRentParking} /> : null}
-                {!userRent && parkingInfo?.isAvailable && isTimeAllowed() ?
-                    <Button title="Rent Parking" color="blue" onPress={onRentParking} />
-                    :
-                    <Text>Parking is currently occupied or unusuable!</Text>} */}
+                        <Button title="End Parking" color="red" style={styles.btn} onPress={endRentParking} />}
             </View>
-
         </View>
     );
 

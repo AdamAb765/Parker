@@ -10,21 +10,28 @@ import * as http from '../api/HttpClient'
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import NumericInput from 'react-native-numeric-input';
 
-
-const createAccessibleDateObject = (timeString) => {
-    const splitTimeString = timeString.split(':')
-
-    return new Date(1, 1, 1, splitTimeString[0], splitTimeString[1], 0)
-}
-
 export default function MyParking({ navigation, route }) {
     const [titleInput, setTitleInput] = useState(route.params.title)
     const [instructionInput, setInstructionsInput] = useState(route.params.instructions)
     const [locationInput, setLocationInput] = useState(route.params.address)
-    const [accessibleStartTime, setAccessibleStartTime] = useState(createAccessibleDateObject(route.params.accessibleStartTime))
-    const [accessibleEndTime, setAccessibleEndTime] = useState(createAccessibleDateObject(route.params.accessibleEndTime))
     const [price, setPrice] = useState(route.params.price)
     const [parkingImage, setParkingImage] = useState(route.params.image);
+    const [parkingSchedule, setParkingSchedule] = useState({
+        accessibleStartTimeSun: new Date(route.params.accessibleStartTimeSun),
+        accessibleEndTimeSun: new Date(route.params.accessibleEndTimeSun),
+        accessibleStartTimeMon: new Date(route.params.accessibleStartTimeMon),
+        accessibleEndTimeMon: new Date(route.params.accessibleEndTimeMon),
+        accessibleStartTimeTue: new Date(route.params.accessibleStartTimeTue),
+        accessibleEndTimeTue: new Date(route.params.accessibleEndTimeTue),
+        accessibleStartTimeWed: new Date(route.params.accessibleStartTimeWed),
+        accessibleEndTimeWed: new Date(route.params.accessibleEndTimeWed),
+        accessibleStartTimeThu: new Date(route.params.accessibleStartTimeThu),
+        accessibleEndTimeThu: new Date(route.params.accessibleEndTimeThu),
+        accessibleStartTimeFri: new Date(route.params.accessibleStartTimeFri),
+        accessibleEndTimeFri: new Date(route.params.accessibleEndTimeFri),
+        accessibleStartTimeSat: new Date(route.params.accessibleStartTimeSat),
+        accessibleEndTimeSat: new Date(route.params.accessibleEndTimeSat),
+    })
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -58,7 +65,7 @@ export default function MyParking({ navigation, route }) {
     }
 
     const onEditParking = async () => {
-        if (titleInput && instructionInput && accessibleStartTime && accessibleEndTime &&
+        if (titleInput && instructionInput && parkingSchedule &&
             (price != 0) && locationInput && parkingImage) {
             let currentLocation
 
@@ -72,8 +79,6 @@ export default function MyParking({ navigation, route }) {
                     ownerId: userInfo.id,
                     title: titleInput,
                     instructions: instructionInput,
-                    accessibleStartTime: accessibleStartTime.toLocaleTimeString(),
-                    accessibleEndTime: accessibleEndTime.toLocaleTimeString(),
                     price: price,
                     address: locationInput,
                     longitude: currentLocation.coords.longitude,
@@ -81,11 +86,13 @@ export default function MyParking({ navigation, route }) {
                     isAvailable: true,
                     cameraName: '',
                     cameraPort: 0,
-                    cameraIpAddress: 0
+                    cameraIpAddress: 0,
+                    ...parkingSchedule
                 }
 
                 http.put('parks/edit', editedParking).then(res => {
                     if (res) {
+                        route.params.getMyParkingSpots()
                         Alert.alert('Success!', 'Parking edited successfully')
                         navigation.goBack(null)
                     } else {
@@ -113,20 +120,7 @@ export default function MyParking({ navigation, route }) {
                     <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
                 </View>
             </View>
-            <View style={{ display: 'flex', flexDirection: 'row', width: '65%', height: '10%', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <Text>Start:</Text>
-                <RNDateTimePicker
-                    mode="time"
-                    value={accessibleStartTime}
-                    is24Hour={true}
-                    onChange={(e, newDate) => { setAccessibleStartTime(newDate) }} />
-                <Text style={{ marginLeft: 50 }}>End:</Text>
-                <RNDateTimePicker
-                    mode="time"
-                    value={accessibleEndTime}
-                    is24Hour={true}
-                    onChange={(e, newDate) => { setAccessibleEndTime(newDate) }} />
-            </View>
+            <Button color="orange" style={{ marginTop: 15, marginBottom: 15 }} title="Edit Parking Schedule" onPress={() => navigation.navigate('Add Parking Schedule', { parkingSchedule, setParkingSchedule })} />
 
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '70%', justifyContent: 'space-evenly', marginBottom: 10 }}>
                 <Text>Price:</Text>
@@ -148,25 +142,25 @@ export default function MyParking({ navigation, route }) {
             <TextInput
                 placeholder="Parking Title"
                 variant="outlined"
-                value={titleInput}
                 style={styles.textInput}
+                value={titleInput}
                 onChangeText={(newText) => setTitleInput(newText)}
             />
             <TextInput
                 placeholder="Parking Instructions"
                 variant="outlined"
-                value={instructionInput}
                 style={styles.textInput}
+                value={instructionInput}
                 onChangeText={(newText) => setInstructionsInput(newText)}
             />
             <TextInput
                 placeholder="Parking Location"
                 variant={'outlined'}
-                value={locationInput}
                 style={styles.textInput}
+                value={locationInput}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
-            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: '90%' }}>
+             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: '90%' }}>
                 <Button title="Edit Parking" color="blue" onPress={onEditParking} />
                 <Button style={styles.historyBtn} title="Parking History" color="green" onPress={() => navigation.navigate("Parking History List", { ...route.params })} />
             </View>

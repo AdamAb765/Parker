@@ -41,7 +41,7 @@ app.post("/createMany", (req, res) => {
 });
 
 app.put("/edit", async (req, res) => {
-  const { vehicle } = req.body;
+  const vehicle = req.body;
 
   const query = { serial: vehicle.serial };
   const doc = await Vehicle.findOneAndUpdate(query, vehicle, {
