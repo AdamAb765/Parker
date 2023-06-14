@@ -182,7 +182,7 @@ const updateOrdersStatus = async () => {
     if (accordingParking.currentParkingCar != order.vehicleSerial &&
       orderEndTime < timeNow) {
       order.isFinished = true
-      order.timeEnd = timeNow.toISOString()
+      order.timeEnd = timeNow
       order.save()
 
       accordingParking.isAvailable = true
