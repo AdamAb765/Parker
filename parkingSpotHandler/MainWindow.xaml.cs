@@ -40,7 +40,7 @@ namespace parkingSpotHandler
             {
                 var formData = new FormUrlEncodedContent(new[]
                 {
-                     new KeyValuePair<string, string>("mail", username),
+                     new KeyValuePair<string, string>("email", username),
                      new KeyValuePair<string, string>("password", password)
                  });
 

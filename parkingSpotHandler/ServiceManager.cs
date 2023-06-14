@@ -18,7 +18,7 @@ namespace parkingSpotHandler
     public class ServiceManager
     {
         private const string RUNNING_PROCESS_ID_FILE = "RunningProcessId.txt"; 
-        private const int PORT_MIN = 42689;
+        private const int PORT_MIN = 1000;
 
         private readonly string m_UserId;
 
@@ -48,6 +48,16 @@ namespace parkingSpotHandler
             string hostName = Dns.GetHostName();
             string myIP = Dns.GetHostEntry(hostName).AddressList[1].ToString();
 
+            foreach (var iP in Dns.GetHostEntry(hostName).AddressList)
+            {
+                if (iP.ToString().Contains('.'))
+                {
+                    return iP.ToString();
+                }
+            }
+           
+
+
             return myIP;
         }
 
@@ -57,7 +67,7 @@ namespace parkingSpotHandler
             Process.Start("explorer.exe", capturesPath);
         }
 
-        public static void RestartCaptureService()
+        public static void RestartCaptureService(string cameraName, string parkingId)
         {
             try
             {
@@ -72,7 +82,7 @@ namespace parkingSpotHandler
             {
             }
 
-            StartCapureServer();
+            StartCapureServer(cameraName, parkingId);
         }
 
         public static bool UpdateParkingCamera(CaptureProcessModel captureProcess)
@@ -103,13 +113,13 @@ namespace parkingSpotHandler
             }
         }
 
-        public static int StartCapureServer()
+        public static int StartCapureServer(string cameraName, string parkingId)
         {
             int portNumber = GetAvailablePort();
 
             string nodePath = "node";
 
-            string serverScriptPath = ".\\capture-handler\\app.js " + portNumber;
+            string serverScriptPath = string.Format(".\\capture-handler\\app.js {0} {1} {2}", portNumber, "\""+ cameraName + "\"", parkingId);
 
             Console.WriteLine("Starting on port: " + portNumber);
             Process capturePrc = new Process();

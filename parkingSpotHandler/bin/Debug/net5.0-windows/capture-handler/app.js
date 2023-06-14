@@ -18,6 +18,11 @@ const outputSuffix = ".jpg";
 
 const API_KEY = "4fe20cf64c591053ded8cd09d83240bf399d7cb6";
 
+const args = process.argv.slice(2);
+const port = args[0];
+const cameraName = args[1];
+const parkingId = args[2];
+
 app.get("/isAlive", (req, res) => {
   res.status(200).send("Still alive");
 });
@@ -33,19 +38,41 @@ app.get("/captureParking/:cameraName", async (req, res) => {
 
 const captureParkingInterval = (cameraName) => {
   setInterval(async () => {
-    console.log("print here the result of the interval");
     const fileName = await captureParking(cameraName);
     const readPhotoResult = await readPhoto(fileName);
+    try {
+      if (readPhotoResult) {
+        console.log(
+          "Photo captured and parsed successfully :" +
+            JSON.stringify(readPhotoResult)
+        );
 
-    if (readPhotoResult) {
-      console.log(
-        "Photo captured and parsed successfully :" +
-          JSON.stringify(readPhotoResult)
-      );
-    } else {
-      console.log("Failed to parse photo");
+        const data = {
+          licensePlate: readPhotoResult.results[0]?.plate,
+          pictureDateTime: readPhotoResult.timestamp,
+        };
+
+        await fetch(`http://localhost:3000/parks/${parkingId}`, {
+          method: "PUT",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then((json) => {
+            result = json;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } else {
+        console.log("Failed to parse photo");
+      }
+    } catch (ex) {
+      console.log(ex);
     }
-  }, 5 * 60 * 1000); // Interval set to 10 minutes in milliseconds
+  }, 5 * 60 * 1000);
 };
 
 const captureParking = (cameraName) => {
@@ -101,11 +128,6 @@ const readPhoto = async (fileName) => {
 
   return result;
 };
-
-const args = process.argv.slice(2);
-
-const port = args[0];
-const cameraName = args[1];
 
 captureParkingInterval(cameraName);
 

@@ -10,6 +10,7 @@ const ParkSchema = new mongoose.Schema({
     longitude: Number,
     latitude: Number,
     isAvailable: Boolean,
+    lastCameraRecord: String,
     currentParkingCar: Number,
     cameraName: String,
     cameraPort: Number,
