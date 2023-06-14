@@ -57,9 +57,9 @@ export default function ParkingHistoryList({ navigation, route }) {
                         <View style={styles.statsBox}>
                             <Text style={styles.moneyLabel}>Total money made: {countTotalRentMoney()} ILS</Text>
                         </View>
-                        <View style={styles.statsBox}>
+                        {/* <View style={styles.statsBox}>
                             <Text style={styles.statusLabel}>Current Status: {route.params.isAvailable ? 'Vacant' : 'Occupied'}!</Text>
-                        </View>
+                        </View> */}
                     </View>
                 </View>
             </View>

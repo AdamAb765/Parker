@@ -99,22 +99,6 @@ export default function Profile({ navigation, route }) {
     }
   };
 
-  const getUserDisplayName = async () => {
-    return "Moshe Jeff";
-
-    const user = await JSON.parse(await AsyncStorage.getItem("@user"));
-
-    return "Moshe Jeff";
-
-    if (user.firstName && user.lastName)
-      return user.firstName + " " + user.lastName;
-    else return "moshe jeff";
-  };
-
-  const getUserDisplayName2 = () => {
-    return "Moshe Jeff";
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -122,7 +106,7 @@ export default function Profile({ navigation, route }) {
           <Image
             style={styles.avatar}
             source={{
-              uri: "https://bootdey.com/img/Content/avatar/avatar1.png",
+              uri: "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
             }}
           />
           <Text style={styles.name}>{auth.currentUser?.displayName}</Text>

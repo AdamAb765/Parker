@@ -17,8 +17,6 @@ export default function Parking({ navigation, route }) {
     const [userRent, setUserRent] = useState(false)
     const [isUsersParking, setIsUsersParking] = useState(false)
     const [userCars, setUserCars] = useState([])
-    const [isCarsDropdownOpen, setIsCarsDropdownOpen] = useState(false);
-    const [chosenCar, setChosenCar] = useState(null);
 
     useEffect(() => {
         getParkingInfo()
@@ -42,50 +40,15 @@ export default function Parking({ navigation, route }) {
         setParkingInfo(parkingInfo)
     }
 
-    // const isTimeAllowed = () => {
-    //     const now = new Date()
-    //     const regex = new RegExp(':', 'g')
-
-    //     return parseInt(now.toLocaleTimeString().replace(regex, ''), 10) > parseInt(parkingInfo?.accessibleStartTime.replace(regex, ''), 10) &&
-    //         parseInt(now.toLocaleTimeString().replace(regex, ''), 10) < parseInt(parkingInfo?.accessibleEndTime.replace(regex, ''), 10)
-    // }
-
     const endRentParking = async () => {
         await http.put(`orders/finishPark`, { ...userRent }).then(res => {
             if (res) {
                 Alert.alert('Success!', 'Rent ended successfully')
                 navigation.goBack(null)
             } else {
-                Alert.alert('Failed!', `Couldnt stop renting. Please try again`)
+                Alert.alert('Failed!', `Couldnt stop renting. Please leave parking with your car and try again`)
             }
         })
-    }
-
-    const onRentParking = async () => {
-        const userInfo = JSON.parse(await AsyncStorage.getItem('@user'))
-
-        if (chosenCar) {
-
-            const newOrder = {
-                parkId: route.params._id,
-                consumerId: userInfo.id,
-                vehicleSerial: chosenCar,
-                timeStart: new Date(),
-                payment: 0
-            }
-
-            http.post(`orders/create`, newOrder)
-                .then(res => {
-                    if (res) {
-                        Alert.alert('Success!', 'Parking rented successfully')
-                        navigation.goBack(null)
-                    } else {
-                        Alert.alert('Failed!', `Couldnt rent parking. Please try again`)
-                    }
-                })
-        } else {
-            Alert.alert('Parking Failed!', `Please choose a car for parking. If you dont have any, please add one in your profile`)
-        }
     }
 
     return (
@@ -140,7 +103,7 @@ export default function Parking({ navigation, route }) {
                         <Text>Your parking is currently occupied by car {parkingInfo?.currentParkingCar}</Text>)
                     :
                     !userRent ?
-                            <Button title="View Schedule" color="blue" style={styles.btn} onPress={() => navigation.navigate('Parking Schedule', {...route.params, ...parkingInfo, userCars})} />
+                        <Button title="View Schedule" color="blue" style={styles.btn} onPress={() => navigation.navigate('Parking Schedule', {...route.params, ...parkingInfo, userCars})} />
                         :
                         <Button title="End Parking" color="red" style={styles.btn} onPress={endRentParking} />}
             </View>

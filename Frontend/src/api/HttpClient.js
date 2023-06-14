@@ -50,3 +50,20 @@ export const put = async (route, body) => {
 
   return result;
 };
+
+export const remove = async (route, body) => {
+  let result;
+  const url = `${SERVER_IP}:${SERVER_PORT}/${route}`;
+
+  const res = await axios.delete(url, body, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.status === REQUEST_SUCESS_STATUS) {
+    result = res.data;
+  }
+
+  return result;
+};

@@ -10,11 +10,40 @@ import { CheckBox } from '@rneui/themed'
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
+import * as http from '../api/HttpClient'
 
 export default function RentingHistoryRent({ navigation, route }) {
 
     const calcMoneyMade = () => {
         return ((Math.abs(new Date(route.params.timeEnd) - new Date(route.params.timeStart)) / 36e5) * route.params.parking.price).toFixed(2)
+    }
+
+    const showCancelParkingBtn = () => {
+        return new Date() < new Date(route.params.timeStart)
+    }
+
+    const cancelParking = async () => {
+        await http.remove(`orders/cancel`, { ...route.params }).then(res => {
+            if (res) {
+                route.params.getRentHistoryForParking()
+                Alert.alert('Success!', 'Rent cancelled successfully')
+                navigation.goBack(null)
+            } else {
+                Alert.alert('Failed!', `Couldnt cancel renting. Please try again`)
+            }
+        })
+    }
+
+    const endRentParking = async () => {
+        await http.put(`orders/finishPark`, { ...route.params }).then(res => {
+            if (res) {
+                route.params.getRentHistoryForParking()
+                Alert.alert('Success!', 'Rent ended successfully')
+                navigation.goBack(null)
+            } else {
+                Alert.alert('Failed!', `Couldnt stop renting. Please leave parking with your car and try again`)
+            }
+        })
     }
 
     return (
@@ -52,9 +81,16 @@ export default function RentingHistoryRent({ navigation, route }) {
                 variant={'outlined'}
                 editable={false}
                 style={styles.textInput}
-                label='Money Paid'
+                label='Cost'
                 value={calcMoneyMade() + ' ILS'}
             />
+            {route.params.isFinished ?
+                null
+                :
+                showCancelParkingBtn() ?
+                    <Button title="Cancel Parking" color="red" style={styles.btn} onPress={cancelParking} />
+                    :
+                    <Button title="End Parking" color="red" style={styles.btn} onPress={endRentParking} />}
         </View>
     );
 };
@@ -87,5 +123,9 @@ const styles = StyleSheet.create({
         width: '70%',
         height: '8%',
         marginBottom: 5,
+    },
+    btn: {
+        height: '6%',
+        width: '55%'
     },
 })

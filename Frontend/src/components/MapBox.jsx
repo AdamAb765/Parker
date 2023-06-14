@@ -4,7 +4,7 @@ import { Marker } from 'react-native-maps';
 import { StyleSheet, Image, Text, TouchableOpacity, Alert } from 'react-native';
 import { Switch } from 'react-native-switch';
 import * as Location from 'expo-location'
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
@@ -101,7 +101,7 @@ export default function MapBox({ navigation }) {
         latitudeDelta: 0.01,
         longitudeDelta: 0.01
       });
-    } 
+    }
   }
 
   const goToMyLocation = async () => {
@@ -141,79 +141,81 @@ export default function MapBox({ navigation }) {
 
   return (
     <>
-    <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width:'92%', height: '10%' }}>
-      <TextInput
-        placeholder="Where would you like to park?"
-        variant="outlined"
-        style={styles.searchInput}
-        onChangeText={(newText) => setSearchInput(newText)}
-        trailing={props => (
-          <IconButton onPress={updateLocation} icon={props => <Icon name="eye" {...props} />} {...props} />
-        )}
-      />
-      <View style={{paddingTop: 12}}>
-      <Switch
-          onValueChange={toggleView}
-          disabled={false}
-          activeText={'Map'}
-          inActiveText={'List'}
-          backgroundActive={'gray'}
-          backgroundInactive={'gray'}
-          circleActiveColor={'#000000'}
-          circleInActiveColor={'#000000'}
-          value={showMap}
-      />
-    </View>
-    </View>
-       {showMap ? (
-        <View style={{width: '100%', height: '80%', position: 'relative'}}>
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        provider={"google"}
-        showsUserLocation={true}
-        initialRegion={{
-          latitude: currentLocation?.latitude || 0,
-          longitude: currentLocation?.longitude || 0,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01
-        }}
-        >
-        {parkings.map((marker, index) => (
-          <Marker key={index}
-            coordinate={{
-              latitude: marker.latitude,
-              longitude: marker.longitude,
+      <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '92%', height: '10%' }}>
+        <TextInput
+          placeholder="Where would you like to park?"
+          variant="outlined"
+          style={styles.searchInput}
+          onChangeText={(newText) => setSearchInput(newText)}
+          trailing={props => (
+            <IconButton onPress={updateLocation} icon={props => <Icon name="eye" {...props} />} {...props} />
+          )}
+        />
+        <View style={{ paddingTop: 12 }}>
+          <Switch
+            onValueChange={toggleView}
+            disabled={false}
+            activeText={'Map'}
+            inActiveText={'List'}
+            backgroundActive={'gray'}
+            backgroundInactive={'gray'}
+            circleActiveColor={'#000000'}
+            circleInActiveColor={'#000000'}
+            value={showMap}
+          />
+        </View>
+      </View>
+      {showMap ? (
+        <View style={{ width: '100%', height: '80%', position: 'relative' }}>
+          <MapView
+            ref={mapRef}
+            style={styles.map}
+            provider={"google"}
+            showsUserLocation={true}
+            initialRegion={{
+              latitude: currentLocation?.latitude || 0,
+              longitude: currentLocation?.longitude || 0,
               latitudeDelta: 0.01,
               longitudeDelta: 0.01
             }}
-            icon={require('../../assets/ParkingPin.png')}
           >
-            <Callout onPress={() => navigation.navigate('Parking', { ...marker })}>
-              <View>
-                <Text>{marker.title}</Text>
-                <Text>{marker.price} ILS Per Hour</Text>
-                <Text>{marker.address}</Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
-      </MapView>
-      <IconButton  style={{position: 'absolute', zIndex: 999, bottom: 20, right: 20, width: '15%', backgroundColor: 'white', borderWidth: 1}} onPress={goToMyLocation} 
-      icon={props => <Icon size={40} name="target"/>} />
-      </View>
+            {parkings.map((marker, index) => (
+              <Marker key={index}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01
+                }}
+                icon={require('../../assets/ParkingPin.png')}
+              >
+                <Callout onPress={() => navigation.navigate('Parking', { ...marker })}>
+                  <View>
+                    <Text>{marker.title}</Text>
+                    <Text>{marker.price} ILS Per Hour</Text>
+                    <Text>{marker.address}</Text>
+                  </View>
+                </Callout>
+              </Marker>
+            ))}
+          </MapView>
+          <IconButton style={{ position: 'absolute', zIndex: 999, bottom: 20, right: 20, width: '15%', backgroundColor: 'white', borderWidth: 1 }} onPress={goToMyLocation}
+            icon={props => <Icon size={40} name="target" />} />
+        </View>
       ) : (
         <View style={styles.parkingList}>
-          {closestParkings.map((marker, index) => (
-             <TouchableOpacity key={index} onPress={() => navigation.navigate('Parking', { ...marker })} >
-              <View  style={styles.parkingListItem} >
-                <Text style={{ textAlign: 'center',fontSize: 18, fontWeight: 'bold', paddingBottom: 5}}>{marker.title}</Text>
-                <Text>{marker.address}</Text>
-                <Text >{marker.price} ILS Per Hour</Text>
-                <Text >Distance: {calculateDistance(currentLocation.latitude, currentLocation.longitude, marker.latitude, marker.longitude).toFixed(2)} KM</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
+            {closestParkings.map((marker, index) => (
+              <TouchableOpacity style={{width: '100%'}} key={index} onPress={() => navigation.navigate('Parking', { ...marker })} >
+                <View style={styles.parkingListItem} >
+                  <Text style={{ textAlign: 'center', fontSize: 18, fontWeight: 'bold', paddingBottom: 5 }}>{marker.title}</Text>
+                  <Text>{marker.address}</Text>
+                  <Text >{marker.price} ILS Per Hour</Text>
+                  <Text >Distance: {calculateDistance(currentLocation.latitude, currentLocation.longitude, marker.latitude, marker.longitude).toFixed(2)} KM</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
       )}
     </>
@@ -241,4 +243,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#bfd5db',
   },
+  body: {
+    alignItems: 'center',
+    padding: 15,
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+},
 });
