@@ -5,7 +5,7 @@ const ParkSchema = new mongoose.Schema({
     price: Number,
     title: String,
     instructions: String,
-    image: String,
+    imagePath: String,
     address: String,
     longitude: Number,
     latitude: Number,

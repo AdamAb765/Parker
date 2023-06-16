@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native';
 import { View } from 'react-native';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
-import { Image } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as http from '../api/HttpClient'
 import RNDateTimePicker from '@react-native-community/datetimepicker';
@@ -25,9 +24,8 @@ export default function AddParking({ navigation, route }) {
             aspect: [4, 3],
             quality: 1,
         });
-
         if (!result.canceled) {
-            setParkingImage(result.assets[0].uri)
+            setParkingImage(result.assets[0])
         }
     };
 
@@ -65,7 +63,6 @@ export default function AddParking({ navigation, route }) {
                     instructions: instructionInput,
                     price: price,
                     address: locationInput,
-                    image: "https://images.seattletimes.com/wp-content/uploads/2022/06/06032022_parking-spot_1650002.jpg?d=1560x1170",
                     longitude: currentLocation.coords.longitude,
                     latitude: currentLocation.coords.latitude,
                     isAvailable: true,
@@ -74,8 +71,19 @@ export default function AddParking({ navigation, route }) {
                     cameraIpAddress: 0,
                     ...parkingSchedule
                 }
+                let formData = new FormData();
+                formData.append('image', {
+                    uri: parkingImage.uri,
+                    type: 'image/jpeg',
+                    name: parkingImage.uri.split('/').pop(),
+                  });
+                for ( let key in newParking ) {
+                    formData.append(key, newParking[key]);
+                }
 
-                http.post('parks/create', newParking).then(res => {
+                http.post('parks/create', formData, {
+                    'Content-Type': 'multipart/form-data',
+                  }).then(res => {
                     if (res) {
                         route.params.getMyParkingSpots()
                         Alert.alert('Success!', 'Parking added successfully')
@@ -83,7 +91,7 @@ export default function AddParking({ navigation, route }) {
                     } else {
                         Alert.alert('Failed!', 'Failed to add parking. Please try again')
                     }
-                })
+                }).catch((e) => console.log(e));
             } else {
                 Alert.alert('Failed!', `Either this parking spot doesnt exist, or youre not using own location. Please try again`)
             }
@@ -97,16 +105,23 @@ export default function AddParking({ navigation, route }) {
             <View style={styles.header}>
                 <View style={styles.headerContent}>
                     <TouchableOpacity onPress={pickImage}>
-                        <Image style={styles.avatar}
-                            contentFit='contain'
-                            source={parkingImage}
-                            placeholder={require("../../assets/listing_parking_placeholder.png")} />
+                        {parkingImage ?
+                            <Image style={styles.avatar}
+                                resizeMode='contain'
+                                source={{uri:parkingImage.uri}}
+                            />
+                            :
+                            <Image style={styles.avatar}
+                                resizeMode='contain'
+                                source={require("../../assets/listing_parking_placeholder.png")}
+                            />
+                        }
                     </TouchableOpacity>
                     <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
                 </View>
             </View>
             <Button color="orange" style={{marginTop: 15, marginBottom: 15}} title="Add Parking Schedule" onPress={() => navigation.navigate('Add Parking Schedule', {parkingSchedule, setParkingSchedule})}/>
-
+            
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '70%', justifyContent: 'space-evenly', marginBottom: 10 }}>
                 <Text>Price:</Text>
                 <NumericInput
@@ -154,16 +169,17 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     header: {
-        height: '43%',
-        width: '100%'
+        height: '20%',
+        width: '100%',
+        marginBottom: 20
     },
     headerContent: {
         alignItems: 'center',
     },
     avatar: {
-        width: 370,
-        height: 240,
-        marginTop: 5
+        minWidth: '50%',
+        maxWidth: '100%',
+        height: '100%',
     },
     name: {
         fontSize: 22,
@@ -173,7 +189,6 @@ const styles = StyleSheet.create({
     statsLabel: {
         fontSize: 14,
         color: '#999999',
-        marginTop: 15
     },
     body: {
         alignItems: 'center',

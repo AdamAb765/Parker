@@ -57,8 +57,8 @@ export default function Parking({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <Image style={styles.avatar}
                         contentFit='contain'
-                        source={route.params?.image}
-                        placeholder={require("../../assets/listing_parking_placeholder.png")} />
+                        source={`${http.get_url()}/parks/image/${parkingInfo.imagePath}`}
+                    />
                 </View>
             </View>
             <View style={{ display: 'flex', flexDirection: 'column', width: '90%', height: '34%', alignSelf: 'center', justifyContent: 'space-between' }}>
