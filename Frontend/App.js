@@ -68,7 +68,7 @@ export default function App() {
       <ProfileStack.Navigator>
         <ProfileStack.Screen
           options={{ headerShown: false }}
-          name="Account"
+          name="Profile"
           component={Profile}
         />
         <ProfileStack.Screen name="Edit Profile" component={AddParking} />
