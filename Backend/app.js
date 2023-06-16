@@ -11,7 +11,7 @@ mongoose
   .connect(db_url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  })
+  }).then(() => console.log("connected to mongo"))
   .catch((error) => console.error(error));
 
 const app = express();
