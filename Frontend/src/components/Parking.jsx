@@ -68,15 +68,16 @@ export default function Parking({ navigation, route }) {
                     label='Parking Title'
                     style={styles.textInput}
                     value={route.params.title}
-                    onChangeText={(newText) => setTitleInput(newText)}
                 />
                 <TextInput
                     variant={'outlined'}
                     editable={false}
-                    style={styles.textInput}
+                    // style={styles.textInput}
+                    inputContainerStyle={{height: '90%', justifyContent: 'center', alignItems: 'center', alignContent: 'center'}}
+                    style={{width: '100%', height: '50%'}}
                     label='Parking Instructions'
                     value={route.params.instructions}
-                    onChangeText={(newText) => setInstructionsInput(newText)}
+                    multiline={true}
                 />
                 <TextInput
                     variant={'outlined'}
@@ -95,7 +96,7 @@ export default function Parking({ navigation, route }) {
                     onChangeText={(newText) => setLocationInput(newText)}
                 />
             </View>
-            <View style={{ display: 'flex', flexDirection: 'row', width: '77%', height: '15%', justifyContent: 'space-around', alignItems: 'center', marginTop: 20 }} >
+            <View style={{ display: 'flex', flexDirection: 'row', width: '77%', height: '15%', justifyContent: 'space-around', alignItems: 'center', marginTop: 60 }} >
                 {isUsersParking ?
                     (parkingInfo?.isAvailable ?
                         <Text>Your parking is currently unoccupied!</Text>

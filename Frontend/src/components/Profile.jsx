@@ -76,29 +76,6 @@ export default function Profile({ navigation, route }) {
     return locationToReturn;
   };
 
-  const onCreateParking = async () => {
-    if (titleInput && descriptionInput) {
-      let currentLocation;
-
-      if (useMyLocation) {
-        currentLocation = await getMyLocation();
-      } else if (locationInput) {
-        currentLocation = await getGeoLocationFromInput();
-      }
-
-      if (currentLocation && currentLocation.coords) {
-        Alert.alert("Success!", "Parking added successfully");
-      } else {
-        Alert.alert(
-          "Failed!",
-          `Either this parking spot doesnt exist, or youre not using own location. Please try again`
-        );
-      }
-    } else {
-      Alert.alert("Failed!", "Please enter all details");
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -161,7 +138,10 @@ export default function Profile({ navigation, route }) {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{...styles.option, marginTop: 30}} onPress={() => signOut(auth)}>
+        <TouchableOpacity style={{ ...styles.option, marginTop: 30 }} onPress={async () => {
+          await AsyncStorage.removeItem("@user");
+          signOut(auth)
+        }}>
           <View style={styles.optionBody}>
             <Text adjustsFontSizeToFit style={styles.logOutText}>
               Log Out

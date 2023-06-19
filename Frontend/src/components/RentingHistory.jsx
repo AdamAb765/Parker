@@ -18,16 +18,9 @@ export default function RentingHistory({ navigation, route }) {
         getRentHistoryForParking()
     }, [])
 
-    const updateActiveRent = async () => {
-        const user = JSON.parse(await AsyncStorage.getItem('@user'));
-        const activeUserRent = await http.get(`orders/byConsumerIsRenting/${user.id}`)
-
-        setActiveRent(activeUserRent)
-    }
-
     const getRentHistoryForParking = async () => {
         const user = JSON.parse(await AsyncStorage.getItem('@user'));
-
+        console.log(user.id)
         const rentList = await http.get(`orders/orderByConsumer/${user.id}`)
 
         const rentListWithParking = await Promise.all(rentList.map(async (rent) => {
