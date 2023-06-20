@@ -7,6 +7,7 @@ const multipart = require('connect-multiparty');
 const multipartMiddleware = multipart();
 var fs = require('fs');
 var path = require('path');
+const { ObjectId } = require("mongodb");
 
 const app = Router();
 
@@ -162,8 +163,10 @@ app.put("/:_id/image", multipartMiddleware, async (req, res) => {
   });
 });
 
-app.put("/setCamera", async (req, res) => {
-  const query = { _id: req.body.parkId };
+app.put("/test/setCamera", async (req, res) => {
+  console.log(req.body)
+  const query = { _id: req.body.parkId};
+  console.log(query)
   const camera = {
     cameraName: req.body.cameraName,
     cameraPort: req.body.cameraPort,

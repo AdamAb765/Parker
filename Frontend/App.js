@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, I18nManager } from "react-native";
+import { StyleSheet, Text, View, I18nManager, LogBox } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -24,6 +24,8 @@ import ParkingHistoryRent from "./src/components/ParkingHistoryRent";
 import RentingHistoryRent from "./src/components/RentingHistoryRent";
 import ParkingSchedule from "./src/components/ParkingSchedule";
 import AddParkingSchedule from "./src/components/AddParkingSchedule";
+
+LogBox.ignoreAllLogs();//Ignore all log notifications
 
 function HomeScreen({ navigation }) {
   return (
@@ -71,7 +73,7 @@ export default function App() {
       <ProfileStack.Navigator>
         <ProfileStack.Screen
           options={{ headerShown: false }}
-          name="Account"
+          name="Your Account"
           component={Profile}
         />
         <ProfileStack.Screen name="Edit Profile" component={AddParking} />

@@ -87,7 +87,9 @@ namespace parkingSpotHandler
 
         public static bool UpdateParkingCamera(CaptureProcessModel captureProcess)
         {
-            string url = $"http://193.106.55.134:3000/parks/setCamera";
+            string url = $"http://193.106.55.134:3000/parks/test/setCamera";
+            //string url = $"http://localhost:3000/parks/test/setCamera";
+
             string serializedCaptureProcess = JsonSerializer.Serialize(captureProcess);
 
             using (HttpClient httpClient = new HttpClient())
@@ -119,7 +121,7 @@ namespace parkingSpotHandler
 
             string nodePath = "node";
 
-            string serverScriptPath = string.Format(".\\capture-handler\\app.js {0} {1} {2}", portNumber, "\""+ cameraName + "\"", parkingId);
+            string serverScriptPath = string.Format(".\\capture-handler\\app.js {0} {1} {2}", portNumber, "\""+ cameraName + "\"", "\"" + parkingId + "\"");
 
             Console.WriteLine("Starting on port: " + portNumber);
             Process capturePrc = new Process();

@@ -57,7 +57,7 @@ export default function Parking({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <Image style={styles.avatar}
                         contentFit='contain'
-                        source={parkingInfo.image.includes('http') ? parkingInfo.image : `${http.get_url()}/parks/image/${parkingInfo.image}`}
+                        source={parkingInfo && parkingInfo.image && parkingInfo.image.includes('http') ? parkingInfo.image : `${http.get_url()}/parks/image/${parkingInfo?.image}`}
                         placeholder={require("../../assets/listing_parking_placeholder.png")} />
                 </View>
             </View>

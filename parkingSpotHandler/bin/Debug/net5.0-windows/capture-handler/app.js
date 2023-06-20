@@ -12,6 +12,13 @@ const fetch = require("node-fetch");
 const FormData = require("form-data");
 const fs = require("fs");
 
+var access = fs.createWriteStream("./logger123.log")
+process.stdout.write = process.stderr.write = access.write.bind(access)
+
+process.on('uncaughtException', err => {
+  console.error((err && err.stack) ? err.stack : err)
+})
+
 const outputFolder = "captures";
 const outputImagePrefix = "car-image-";
 const outputSuffix = ".jpg";
@@ -28,12 +35,17 @@ app.get("/isAlive", (req, res) => {
 });
 
 app.get("/captureParking/:cameraName", async (req, res) => {
-  const { cameraName } = req.params;
-  const fileName = await captureParking(cameraName);
-  const readPhotoResult = await readPhoto(fileName);
+  try {
+    const { cameraName } = req.params;
+    const fileName = await captureParking(cameraName);
+    const readPhotoResult = await readPhoto(fileName);
 
-  if (readPhotoResult) res.status(200).send(readPhotoResult);
-  else res.status(503).send("couldnt parse photo");
+    if (readPhotoResult) res.status(200).send(readPhotoResult);
+    else res.status(503).send("couldnt parse photo");
+  } catch (e) {
+    console.log(e)
+    res.status(503).send("couldnt parse photo");
+  }
 });
 
 const captureParkingInterval = (cameraName) => {
@@ -44,7 +56,7 @@ const captureParkingInterval = (cameraName) => {
       if (readPhotoResult) {
         console.log(
           "Photo captured and parsed successfully :" +
-            JSON.stringify(readPhotoResult)
+          JSON.stringify(readPhotoResult)
         );
 
         const data = {
@@ -72,61 +84,71 @@ const captureParkingInterval = (cameraName) => {
     } catch (ex) {
       console.log(ex);
     }
-  }, 1 * 60 * 1000);
+  }, 0.5 * 60 * 1000);
 };
 
 const captureParking = (cameraName) => {
-  var dir = path.join(__dirname, `${outputFolder}/${cameraName}`);
+  try {
+    var dir = path.join(__dirname, `${outputFolder}/${cameraName}`);
 
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+
+    const fileName = path.join(
+      __dirname,
+      `${outputFolder}/${cameraName}/${outputImagePrefix}${uuid()}${outputSuffix}`
+    );
+
+    return new Promise((resolve, reject) => {
+      const command = ffmpeg()
+        .input(`video=${cameraName}`)
+        .inputFormat("dshow")
+        .frames(1)
+        .output(fileName)
+        .on("end", () => {
+          console.log("Picture Taken");
+          resolve(fileName);
+        })
+        .on("error", (err) => {
+          return reject(new Error(err));
+        });
+
+      command.run();
+    });
   }
-
-  const fileName = path.join(
-    __dirname,
-    `${outputFolder}/${cameraName}/${outputImagePrefix}${uuid()}${outputSuffix}`
-  );
-
-  return new Promise((resolve, reject) => {
-    const command = ffmpeg()
-      .input(`video=${cameraName}`)
-      .inputFormat("dshow")
-      .frames(1)
-      .output(fileName)
-      .on("end", () => {
-        console.log("Picture Taken");
-        resolve(fileName);
-      })
-      .on("error", (err) => {
-        return reject(new Error(err));
-      });
-
-    command.run();
-  });
+  catch (e) {
+    console.log(e)
+  }
 };
 
 const readPhoto = async (fileName) => {
-  let body = new FormData();
-  body.append("upload", fs.createReadStream(fileName));
-  body.append("regions", "il");
-  let result;
+  try {
+    let body = new FormData();
+    body.append("upload", fs.createReadStream(fileName));
+    body.append("regions", "il");
+    let result;
 
-  await fetch("https://api.platerecognizer.com/v1/plate-reader/", {
-    method: "POST",
-    headers: {
-      Authorization: `Token ${API_KEY}`,
-    },
-    body: body,
-  })
-    .then((res) => res.json())
-    .then((json) => {
-      result = json;
+    await fetch("https://api.platerecognizer.com/v1/plate-reader/", {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${API_KEY}`,
+      },
+      body: body,
     })
-    .catch((err) => {
-      console.log(err);
-    });
+      .then((res) => res.json())
+      .then((json) => {
+        result = json;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-  return result;
+    return result;
+  }
+  catch (e) {
+    console.log(e)
+  }
 };
 
 captureParkingInterval(cameraName);

@@ -129,7 +129,7 @@ export default function MyParking({ navigation, route }) {
                                 type: mimeType,
                                 name: parkingImage.uri.split('/').pop(),
                             });
-                            console.log(formData)
+
                             await http.put(`parks/${route.params._id}/image`, formData, {
                                 'Content-Type': 'multipart/form-data',
                             }).then(res => {

@@ -1,16 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "oZZUas9CLHoB4xGH4P1USiyoCIRWArSxWM4kiWicMnJ4/dWcWTMTn57788qthlATQtVooRKZs2y4ay4eEsQRfQ==",
+  "dgSpecHash": "gqIEAXoKNNVEYX2aL0ik0uCPhODWXQBTDNDB5uZ7tL2VmhxpU1v4vK6B2m2k+9zmW9b7us2Zx/LM9inYaW0d+w==",
   "success": true,
-  "projectFilePath": "D:\\studies\\Final Project\\Parker\\parkingSpotHandler\\parkingSpotHandler.csproj",
+  "projectFilePath": "C:\\projects\\git-workspace\\Parker\\parkingSpotHandler\\parkingSpotHandler.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\User\\.nuget\\packages\\aforge\\2.2.5\\aforge.2.2.5.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\aforge.video\\2.2.5\\aforge.video.2.2.5.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\aforge.video.directshow\\2.2.5\\aforge.video.directshow.2.2.5.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\5.0.13\\microsoft.netcore.app.host.win-x64.5.0.13.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\5.0.0\\microsoft.aspnetcore.app.ref.5.0.0.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\5.0.0\\microsoft.windowsdesktop.app.ref.5.0.0.nupkg.sha512",
-    "C:\\Users\\User\\.nuget\\packages\\microsoft.netcore.app.ref\\5.0.0\\microsoft.netcore.app.ref.5.0.0.nupkg.sha512"
+    "C:\\Users\\mazal\\.nuget\\packages\\aforge\\2.2.5\\aforge.2.2.5.nupkg.sha512",
+    "C:\\Users\\mazal\\.nuget\\packages\\aforge.video\\2.2.5\\aforge.video.2.2.5.nupkg.sha512",
+    "C:\\Users\\mazal\\.nuget\\packages\\aforge.video.directshow\\2.2.5\\aforge.video.directshow.2.2.5.nupkg.sha512"
   ],
   "logs": [
     {

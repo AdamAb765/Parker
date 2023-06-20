@@ -39,8 +39,6 @@ export default function LoginScreen({ navigation }) {
         .then(async (userCredential) => {
           const userInfo = await http.get(`users/byEmail/${email}`);
           await AsyncStorage.setItem("@user", JSON.stringify(userInfo));
-
-          console.log(`${userCredential.user.displayName} is logged in!`);
         })
         .catch((error) => {
           Alert.alert("Failed!", `${error.message}`);
