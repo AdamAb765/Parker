@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Stack,
   TextInput,
@@ -21,11 +21,23 @@ export default function LoginScreen({ navigation }) {
   const { passwordVisibility, visibleIcon, handlePasswordVisibility } =
     useTogglePasswordVisibility();
 
-  const onLoginSubmit = async () => {
-    if (emailInput && passwordInput) {
-      await signInWithEmailAndPassword(auth, emailInput, passwordInput)
+  const tryInitialLogin = async () => {
+    const user = JSON.parse(await AsyncStorage.getItem('@user'));
+    
+    if(user && user.email && user.password) {
+      onLoginSubmit(user.email, user.password)
+    }
+  }
+
+  useEffect(() => {
+    tryInitialLogin()
+  }, []);
+
+  const onLoginSubmit = async (email, password) => {
+    if (email && password) {
+      await signInWithEmailAndPassword(auth, email, password)
         .then(async (userCredential) => {
-          const userInfo = await http.get(`users/byEmail/${emailInput}`);
+          const userInfo = await http.get(`users/byEmail/${email}`);
           await AsyncStorage.setItem("@user", JSON.stringify(userInfo));
 
           console.log(`${userCredential.user.displayName} is logged in!`);
@@ -75,7 +87,7 @@ export default function LoginScreen({ navigation }) {
         color="#2194ED"
         tintColor="white"
         style={styles.loginButton}
-        onPress={onLoginSubmit}
+        onPress={() => onLoginSubmit(emailInput, passwordInput)}
       />
       <Button
         title="Sign Up"

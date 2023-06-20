@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { View } from 'react-native';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
+import { Image } from 'expo-image';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as http from '../api/HttpClient'
 import RNDateTimePicker from '@react-native-community/datetimepicker';
@@ -13,6 +14,8 @@ export default function MyParking({ navigation, route }) {
     const [titleInput, setTitleInput] = useState(route.params.title)
     const [instructionInput, setInstructionsInput] = useState(route.params.instructions)
     const [locationInput, setLocationInput] = useState(route.params.address)
+    const [price, setPrice] = useState(route.params.price)
+    const [parkingImage, setParkingImage] = useState(route.params.image);
     const [parkingSchedule, setParkingSchedule] = useState({
         accessibleStartTimeSun: new Date(route.params.accessibleStartTimeSun),
         accessibleEndTimeSun: new Date(route.params.accessibleEndTimeSun),
@@ -29,20 +32,17 @@ export default function MyParking({ navigation, route }) {
         accessibleStartTimeSat: new Date(route.params.accessibleStartTimeSat),
         accessibleEndTimeSat: new Date(route.params.accessibleEndTimeSat),
     })
-    const [price, setPrice] = useState(route.params.price)
-    const [parkingImage, setParkingImage] = useState();
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Image,
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
-            allowsMultipleSelection: false,
         });
 
         if (!result.canceled) {
-            setParkingImage(result.assets[0])
+            setParkingImage(result.assets[0].uri)
         }
     };
 
@@ -64,18 +64,9 @@ export default function MyParking({ navigation, route }) {
         return locationToReturn
     }
 
-    const getMimeType = (extension) => {
-        const mimeTypes = {
-          jpg: 'image/jpeg',
-          jpeg: 'image/jpeg',
-          png: 'image/png',
-        };
-        return mimeTypes[extension];
-      }
-
     const onEditParking = async () => {
         if (titleInput && instructionInput && parkingSchedule &&
-            (price != 0) && locationInput) {
+            (price != 0) && locationInput && parkingImage) {
             let currentLocation
 
             currentLocation = await getGeoLocationFromInput()
@@ -90,7 +81,6 @@ export default function MyParking({ navigation, route }) {
                     instructions: instructionInput,
                     price: price,
                     address: locationInput,
-                    imagePath: route.params.imagePath,
                     longitude: currentLocation.coords.longitude,
                     latitude: currentLocation.coords.latitude,
                     isAvailable: true,
@@ -99,31 +89,16 @@ export default function MyParking({ navigation, route }) {
                     cameraIpAddress: 0,
                     ...parkingSchedule
                 }
-                http.put(`parks/${route.params._id}`, editedParking).then(res => {
-                    if (!res) {
+
+                http.put('parks/edit', editedParking).then(res => {
+                    if (res) {
+                        route.params.getMyParkingSpots()
+                        Alert.alert('Success!', 'Parking edited successfully')
+                        navigation.goBack(null)
+                    } else {
                         Alert.alert('Failed!', 'Failed to edit parking. Please try again')
-                        return;
                     }
-                });
-                
-                if (parkingImage) {
-                    let formData = new FormData();
-                    const mimeType = getMimeType(parkingImage.uri.split('.').pop());
-                    formData.append('image', {
-                        uri: parkingImage.uri,
-                        type: mimeType,
-                        name: parkingImage.uri.split('/').pop(),
-                    });
-                    await http.put(`parks/${route.params._id}/image`, formData, {
-                        'Content-Type': 'multipart/form-data',
-                      }).then(res => {
-                        if (!res) {
-                            Alert.alert('Failed!', 'Failed to edit parking. Please try again')
-                        }
-                    })
-                }
-                Alert.alert('Success!', 'Parking edited successfully')
-                navigation.goBack(null)
+                })
             } else {
                 Alert.alert('Failed!', `This address doesnt exist. Please try again`)
             }
@@ -137,17 +112,10 @@ export default function MyParking({ navigation, route }) {
             <View style={styles.header}>
                 <View style={styles.headerContent}>
                     <TouchableOpacity onPress={pickImage}>
-                        {parkingImage ?
-                            <Image style={styles.avatar}
-                                resizeMode='contain'
-                                source={{uri:parkingImage.uri}}
-                            />
-                            :
-                            <Image style={styles.avatar}
-                                resizeMode='contain'
-                                source={{uri:`${http.get_url()}/parks/image/${route.params.imagePath}`}}
-                            />
-                        }
+                        <Image style={styles.avatar}
+                            contentFit='contain'
+                            source={parkingImage}
+                            placeholder={require("../../assets/listing_parking_placeholder.png")} />
                     </TouchableOpacity>
                     <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
                 </View>
@@ -207,17 +175,16 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     header: {
-        height: '20%',
-        width: '100%',
-        marginBottom: 20
+        height: '43%',
+        width: '100%'
     },
     headerContent: {
         alignItems: 'center',
     },
     avatar: {
-        minWidth: '50%',
-        maxWidth: '100%',
-        height: '100%',
+        width: 370,
+        height: 240,
+        marginTop: 5
     },
     name: {
         fontSize: 22,

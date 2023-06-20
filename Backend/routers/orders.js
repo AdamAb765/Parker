@@ -5,6 +5,7 @@ const {
   isParkingSpotAvalibale,
   getCurrLicensePlate,
 } = require("../common/prakingSpotsBL");
+const { ObjectId } = require("mongodb");
 
 const app = Router();
 
@@ -84,7 +85,8 @@ app.get("/byParkAndConsumer/:parkId/:consumerId", async (req, res) => {
   }
 });
 
-app.get("/orderByConsumer/:consumerId", async (req, res, next) => {
+app.get("/orderByConsumer/:consumerId", async (req, res) => {
+  console.log('order by cunsumer')
   const query = { consumerId: req.params.consumerId };
   const order = await Order.find(query);
   res.json(order);
@@ -117,10 +119,9 @@ app.put("/finishPark", async (req, res) => {
   }
 });
 
-app.delete("/cancel", async (req, res) => {
-  const { _id } = req.body;
+app.delete("/cancel/:_id", async (req, res) => {
 
-  const order = await Order.deleteOne(_id);
+  const order = await Order.deleteOne({"_id": new ObjectId(req.params._id)});
 
   if (order) {
     res.status(200).json(order);
@@ -182,7 +183,7 @@ const updateOrdersStatus = async () => {
     if (accordingParking.currentParkingCar != order.vehicleSerial &&
       orderEndTime < timeNow) {
       order.isFinished = true
-      order.timeEnd = timeNow
+      order.timeEnd = timeNow.toISOString()
       order.save()
 
       accordingParking.isAvailable = true
