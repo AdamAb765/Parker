@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Alert, Image } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Alert, Image, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { View } from 'react-native';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
 import axios from 'axios';
@@ -16,16 +16,37 @@ export default function AddParking({ navigation, route }) {
     const [price, setPrice] = useState(0)
     const [parkingImage, setParkingImage] = useState(null);
     const [parkingSchedule, setParkingSchedule] = useState(null)
+    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardWillShow', () => {
+            setIsKeyboardOpen(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardWillHide', () => {
+            setIsKeyboardOpen(false);
+        });
+
+        // Clean up listeners
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
 
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-        if (!result.canceled) {
-            setParkingImage(result.assets[0])
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Image,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            });
+
+            if (!result.canceled) {
+                setParkingImage(result.assets[0])
+            }
+        } catch (e) {
+            console.log(e)
         }
     };
 
@@ -48,7 +69,7 @@ export default function AddParking({ navigation, route }) {
     }
 
     const onCreateParking = async () => {
-        if (titleInput && instructionInput && (price != 0) && 
+        if (titleInput && instructionInput && (price != 0) &&
             locationInput && parkingImage && parkingSchedule) {
             let currentLocation
 
@@ -76,14 +97,14 @@ export default function AddParking({ navigation, route }) {
                     uri: parkingImage.uri,
                     type: 'image/jpeg',
                     name: parkingImage.uri.split('/').pop(),
-                  });
-                for ( let key in newParking ) {
+                });
+                for (let key in newParking) {
                     formData.append(key, newParking[key]);
                 }
 
                 http.post('parks/create', formData, {
                     'Content-Type': 'multipart/form-data',
-                  }).then(res => {
+                }).then(res => {
                     if (res) {
                         route.params.getMyParkingSpots()
                         Alert.alert('Success!', 'Parking added successfully')
@@ -101,27 +122,34 @@ export default function AddParking({ navigation, route }) {
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.headerContent}>
-                    <TouchableOpacity onPress={pickImage}>
-                        {parkingImage ?
-                            <Image style={styles.avatar}
-                                resizeMode='contain'
-                                source={{ uri: parkingImage.uri ? parkingImage.uri : parkingImage }}
-                            />
-                            :
-                            <Image style={styles.avatar}
-                                resizeMode='contain'
-                                source={require("../../assets/listing_parking_placeholder.png")}
-                            />
-                        }
-                    </TouchableOpacity>
-                    <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
+        <KeyboardAvoidingView style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            {isKeyboardOpen ? null
+                :
+                <View style={styles.header}>
+                    <View style={styles.headerContent}>
+                        <TouchableOpacity onPress={pickImage}>
+                            {parkingImage ?
+                                <Image style={styles.avatar}
+                                    resizeMode='contain'
+                                    source={{ uri: parkingImage.uri ? parkingImage.uri : parkingImage }}
+                                    placeholder={require("../../assets/listing_parking_placeholder.png")}
+                                />
+                                :
+                                <Image style={styles.avatar}
+                                    resizeMode='contain'
+                                    source={require("../../assets/listing_parking_placeholder.png")}
+                                />
+                            }
+                        </TouchableOpacity>
+                        {parkingImage ? null : <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>}
+                    </View>
                 </View>
-            </View>
-            <Button color="orange" style={{marginTop: 15, marginBottom: 15}} title="Add Parking Schedule" onPress={() => navigation.navigate('Add Parking Schedule', {parkingSchedule, setParkingSchedule})}/>
-            
+            }
+
+            <Button color="orange" style={{ marginTop: 15, marginBottom: 15 }} title="Add Parking Schedule" onPress={() => navigation.navigate('Add Parking Schedule', { parkingSchedule, setParkingSchedule })} />
+
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '70%', justifyContent: 'space-evenly', marginBottom: 10 }}>
                 <Text>Price:</Text>
                 <NumericInput
@@ -158,7 +186,7 @@ export default function AddParking({ navigation, route }) {
                 onChangeText={(newText) => setLocationInput(newText)}
             />
             <Button title="Create Parking" color="blue" onPress={onCreateParking} />
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 

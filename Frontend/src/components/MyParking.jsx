@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, Alert, ScrollView, Keyboard, KeyboardAvoidingView } from 'react-native';
 import { View } from 'react-native';
 import { Stack, TextInput, IconButton, Button } from "@react-native-material/core";
 import axios from 'axios';
@@ -32,6 +32,22 @@ export default function MyParking({ navigation, route }) {
         accessibleStartTimeSat: new Date(route.params.accessibleStartTimeSat),
         accessibleEndTimeSat: new Date(route.params.accessibleEndTimeSat),
     })
+    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardWillShow', () => {
+            setIsKeyboardOpen(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardWillHide', () => {
+            setIsKeyboardOpen(false);
+        });
+
+        // Clean up listeners
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -113,17 +129,18 @@ export default function MyParking({ navigation, route }) {
                                 type: mimeType,
                                 name: parkingImage.uri.split('/').pop(),
                             });
+                            console.log(formData)
                             await http.put(`parks/${route.params._id}/image`, formData, {
                                 'Content-Type': 'multipart/form-data',
                             }).then(res => {
                                 if (!res) {
                                     Alert.alert('Failed!', 'Failed to edit parking. Please try again')
+                                } else {
+                                    Alert.alert('Success!', 'Parking edited successfully')
+                                    navigation.goBack(null)
                                 }
                             })
                         }
-
-                        Alert.alert('Success!', 'Parking edited successfully')
-                        navigation.goBack(null)
                     }
                 })
             } else {
@@ -135,27 +152,32 @@ export default function MyParking({ navigation, route }) {
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.headerContent}>
-                    <TouchableOpacity onPress={pickImage}>
-                        {parkingImage ?
-                            <Image style={styles.avatar}
-                                resizeMode='contain'
-                                source={{ uri: parkingImage.uri ? parkingImage.uri : parkingImage }}
-                                placeholder={require("../../assets/listing_parking_placeholder.png")} 
-                            />
-                            :
-                            <Image style={styles.avatar}
-                                resizeMode='contain'
-                                source={{ uri: `${http.get_url()}/parks/image/${route.params.image}` }}
-                                placeholder={require("../../assets/listing_parking_placeholder.png")} 
-                            />
-                        }
-                    </TouchableOpacity>
-                    <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
-                </View>
-            </View>
+        <KeyboardAvoidingView style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            {isKeyboardOpen ? null
+                :
+                <View style={styles.header}>
+                    <View style={styles.headerContent}>
+                        <TouchableOpacity onPress={pickImage}>
+                            {parkingImage.includes('http') ?
+                                <Image style={styles.avatar}
+                                    resizeMode='contain'
+                                    source={{ uri: parkingImage }}
+                                    placeholder={require("../../assets/listing_parking_placeholder.png")}
+                                />
+                                :
+                                <Image style={styles.avatar}
+                                    resizeMode='contain'
+                                    source={{ uri: `${http.get_url()}/parks/image/${route.params.image}` }}
+                                    placeholder={require("../../assets/listing_parking_placeholder.png")}
+                                />
+                            }
+                        </TouchableOpacity>
+                        <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
+                    </View>
+                </View>}
+
             <Button color="orange" style={{ marginTop: 15, marginBottom: 15 }} title="Edit Parking Schedule" onPress={() => navigation.navigate('Add Parking Schedule', { parkingSchedule, setParkingSchedule })} />
 
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '70%', justifyContent: 'space-evenly', marginBottom: 10 }}>
@@ -200,7 +222,7 @@ export default function MyParking({ navigation, route }) {
                 <Button title="Edit Parking" color="blue" onPress={onEditParking} />
                 <Button style={styles.historyBtn} title="Parking History" color="green" onPress={() => navigation.navigate("Parking History List", { ...route.params })} />
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 

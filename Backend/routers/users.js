@@ -22,7 +22,6 @@ app.get("/byEmail/:email", async (req, res) => {
 });
 
 app.post("/create", (req, res) => {
-  console.log(req.body);
   const newUser = new User(req.body);
   newUser
     .save()
@@ -33,7 +32,6 @@ app.post("/create", (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  console.log(req.body);
   const { email, password } = req.body;
   const query = { email: email, password: password };
   const user = await User.findOne(query);
@@ -45,7 +43,6 @@ app.post("/login", async (req, res) => {
 });
 
 app.put("/edit", async (req, res) => {
-  console.log("update: " + req.body);
   const { user } = req.body;
   const query = { id: user.id };
 
