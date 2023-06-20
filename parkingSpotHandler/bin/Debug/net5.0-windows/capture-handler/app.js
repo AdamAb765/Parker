@@ -52,7 +52,7 @@ const captureParkingInterval = (cameraName) => {
           pictureDateTime: readPhotoResult.timestamp,
         };
 
-        await fetch(`http://localhost:3000/parks/${parkingId}`, {
+        await fetch(`http://193.106.55.134:3000/parks/${parkingId}`, {
           method: "PUT",
           body: JSON.stringify(data),
           headers: {
@@ -72,7 +72,7 @@ const captureParkingInterval = (cameraName) => {
     } catch (ex) {
       console.log(ex);
     }
-  }, 5 * 60 * 1000);
+  }, 1 * 60 * 1000);
 };
 
 const captureParking = (cameraName) => {

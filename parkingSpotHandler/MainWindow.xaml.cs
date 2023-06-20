@@ -32,7 +32,7 @@ namespace parkingSpotHandler
 
         private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
-            string url = "http://localhost:3000/users/login";
+            string url = "http://193.106.55.134:3000/users/login";
             string username = txtUsername.Text;
             string password = txtPassword.Password;
 

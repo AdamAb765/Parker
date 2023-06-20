@@ -87,7 +87,7 @@ namespace parkingSpotHandler
 
         public static bool UpdateParkingCamera(CaptureProcessModel captureProcess)
         {
-            string url = $"http://localhost:3000/parks/setCamera";
+            string url = $"http://193.106.55.134:3000/parks/setCamera";
             string serializedCaptureProcess = JsonSerializer.Serialize(captureProcess);
 
             using (HttpClient httpClient = new HttpClient())
@@ -105,7 +105,7 @@ namespace parkingSpotHandler
         {
             using (HttpClient httpClient = new HttpClient())
             {
-                var response = httpClient.GetAsync("http://localhost:3000/parks/parkByOwner/" + userId).Result;
+                var response = httpClient.GetAsync("http://193.106.55.134:3000/parks/parkByOwner/" + userId).Result;
                 string responseContent = response.Content.ReadAsStringAsync().Result;
                 var parkingSpots = JsonSerializer.Deserialize<IEnumerable<ParkingSpotModel>>(responseContent);
 
