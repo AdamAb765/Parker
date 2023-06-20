@@ -145,8 +145,8 @@ app.put("/:_id/image", multipartMiddleware, async (req, res) => {
       });
   });
   
-  let oldImageName = park.imagePath;
-  park.imagePath = newImageName;
+  let oldImageName = park.image;
+  park.image = newImageName;
 
   Park.updateOne(query, { $set: park })
   .then(() => {
