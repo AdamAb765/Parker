@@ -23,7 +23,8 @@ export default function RentingHistoryRent({ navigation, route }) {
     }
 
     const cancelParking = async () => {
-        await http.remove(`orders/cancel`, { ...route.params }).then(res => {
+        console.log(route.params)
+        await http.remove(`orders/cancel/` + route.params._id).then(res => {
             if (res) {
                 route.params.getRentHistoryForParking()
                 Alert.alert('Success!', 'Rent cancelled successfully')

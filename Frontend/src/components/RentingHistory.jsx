@@ -69,8 +69,11 @@ export default function RentingHistory({ navigation, route }) {
                     {rents.map((rent, index) => (
                         <TouchableOpacity key={index} style={styles.option} onPress={() => navigation.navigate('Renting History Rent', { ...rent, getRentHistoryForParking })}>
                             <View style={styles.optionBody}>
+                                
                                 <Text adjustsFontSizeToFit
-                                    style={styles.optionText}>{new Date(rent.timeEnd).toLocaleDateString()} - {rent?.parking?.title}</Text>
+                                    style={rent?.isFinished?styles.optionText: styles.redOptionText}>{new Date(rent.timeEnd).toLocaleDateString()} - {rent?.parking?.title}</Text>
+                                
+                                
                                 <Icon name="chevron-right" size={24} />
                             </View>
                         </TouchableOpacity>
@@ -107,6 +110,10 @@ const styles = StyleSheet.create({
     optionText: {
         fontSize: 20,
         color: '#6a717d',
+    },
+    redOptionText: {
+        fontSize: 20,
+        color: 'green'
     },
     header: {
         backgroundColor: '#fff',
