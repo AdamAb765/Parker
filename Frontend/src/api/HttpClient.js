@@ -5,6 +5,8 @@ const SERVER_IP = "http://193.106.55.134";
 const SERVER_PORT = "3000";
 const REQUEST_SUCESS_STATUS = 200;
 
+export const get_url = () => `${SERVER_IP}:${SERVER_PORT}`
+
 export const get = async (route) => {
   let result;
   const url = `${SERVER_IP}:${SERVER_PORT}/${route}`;

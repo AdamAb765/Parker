@@ -35,14 +35,15 @@ export default function MyParking({ navigation, route }) {
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            mediaTypes: ImagePicker.MediaTypeOptions.Image,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
+            allowsMultipleSelection: false,
         });
 
         if (!result.canceled) {
-            setParkingImage(result.assets[0].uri)
+            setParkingImage(result.assets[0])
         }
     };
 
@@ -64,9 +65,18 @@ export default function MyParking({ navigation, route }) {
         return locationToReturn
     }
 
+    const getMimeType = (extension) => {
+        const mimeTypes = {
+            jpg: 'image/jpeg',
+            jpeg: 'image/jpeg',
+            png: 'image/png',
+        };
+        return mimeTypes[extension];
+    }
+
     const onEditParking = async () => {
         if (titleInput && instructionInput && parkingSchedule &&
-            (price != 0) && locationInput && parkingImage) {
+            (price != 0) && locationInput) {
             let currentLocation
 
             currentLocation = await getGeoLocationFromInput()
@@ -90,13 +100,30 @@ export default function MyParking({ navigation, route }) {
                     ...parkingSchedule
                 }
 
-                http.put('parks/edit', editedParking).then(res => {
-                    if (res) {
-                        route.params.getMyParkingSpots()
+                http.put(`parks/edit`, editedParking).then(async (res) => {
+                    if (!res) {
+                        Alert.alert('Failed!', 'Failed to edit parking. Please try again')
+                        return;
+                    } else {
+                        if (parkingImage) {
+                            let formData = new FormData();
+                            const mimeType = getMimeType(parkingImage.uri.split('.').pop());
+                            formData.append('image', {
+                                uri: parkingImage.uri,
+                                type: mimeType,
+                                name: parkingImage.uri.split('/').pop(),
+                            });
+                            await http.put(`parks/${route.params._id}/image`, formData, {
+                                'Content-Type': 'multipart/form-data',
+                            }).then(res => {
+                                if (!res) {
+                                    Alert.alert('Failed!', 'Failed to edit parking. Please try again')
+                                }
+                            })
+                        }
+
                         Alert.alert('Success!', 'Parking edited successfully')
                         navigation.goBack(null)
-                    } else {
-                        Alert.alert('Failed!', 'Failed to edit parking. Please try again')
                     }
                 })
             } else {
@@ -112,10 +139,19 @@ export default function MyParking({ navigation, route }) {
             <View style={styles.header}>
                 <View style={styles.headerContent}>
                     <TouchableOpacity onPress={pickImage}>
-                        <Image style={styles.avatar}
-                            contentFit='contain'
-                            source={parkingImage}
-                            placeholder={require("../../assets/listing_parking_placeholder.png")} />
+                        {parkingImage ?
+                            <Image style={styles.avatar}
+                                resizeMode='contain'
+                                source={{ uri: parkingImage.uri ? parkingImage.uri : parkingImage }}
+                                placeholder={require("../../assets/listing_parking_placeholder.png")} 
+                            />
+                            :
+                            <Image style={styles.avatar}
+                                resizeMode='contain'
+                                source={{ uri: `${http.get_url()}/parks/image/${route.params.image}` }}
+                                placeholder={require("../../assets/listing_parking_placeholder.png")} 
+                            />
+                        }
                     </TouchableOpacity>
                     <Text style={styles.statsLabel}>Press the pin to add a picture!</Text>
                 </View>
@@ -160,7 +196,7 @@ export default function MyParking({ navigation, route }) {
                 value={locationInput}
                 onChangeText={(newText) => setLocationInput(newText)}
             />
-             <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: '90%' }}>
+            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', width: '90%' }}>
                 <Button title="Edit Parking" color="blue" onPress={onEditParking} />
                 <Button style={styles.historyBtn} title="Parking History" color="green" onPress={() => navigation.navigate("Parking History List", { ...route.params })} />
             </View>

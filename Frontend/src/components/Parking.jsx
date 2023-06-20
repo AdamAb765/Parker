@@ -57,7 +57,7 @@ export default function Parking({ navigation, route }) {
                 <View style={styles.headerContent}>
                     <Image style={styles.avatar}
                         contentFit='contain'
-                        source={route.params?.image}
+                        source={parkingInfo.image.includes('http') ? parkingInfo.image : `${http.get_url()}/parks/image/${parkingInfo.image}`}
                         placeholder={require("../../assets/listing_parking_placeholder.png")} />
                 </View>
             </View>
@@ -73,8 +73,8 @@ export default function Parking({ navigation, route }) {
                     variant={'outlined'}
                     editable={false}
                     // style={styles.textInput}
-                    inputContainerStyle={{height: '90%', justifyContent: 'center', alignItems: 'center', alignContent: 'center'}}
-                    style={{width: '100%', height: '50%'}}
+                    inputContainerStyle={{ height: '90%', justifyContent: 'center', alignItems: 'center', alignContent: 'center' }}
+                    style={{ width: '100%', height: '50%' }}
                     label='Parking Instructions'
                     value={route.params.instructions}
                     multiline={true}
@@ -104,7 +104,7 @@ export default function Parking({ navigation, route }) {
                         <Text>Your parking is currently occupied by car {parkingInfo?.currentParkingCar}</Text>)
                     :
                     !userRent ?
-                        <Button title="View Schedule" color="blue" style={styles.btn} onPress={() => navigation.navigate('Parking Schedule', {...route.params, ...parkingInfo, userCars})} />
+                        <Button title="View Schedule" color="blue" style={styles.btn} onPress={() => navigation.navigate('Parking Schedule', { ...route.params, ...parkingInfo, userCars })} />
                         :
                         <Button title="End Parking" color="red" style={styles.btn} onPress={endRentParking} />}
             </View>
