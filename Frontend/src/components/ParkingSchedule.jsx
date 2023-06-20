@@ -36,6 +36,7 @@ export default function ParkingSchedule({ navigation, route }) {
                     Alert.alert("Failed!", "Parking occupied during chosen time! Please try different times")
                 } else {
                     Alert.alert("Success!", "Parking scheduled successfully!")
+                    navigation.goBack(null)
                 }
             } else {
                 Alert.alert("Failed!", "Please choose a single day and make sure start time is before end time!")

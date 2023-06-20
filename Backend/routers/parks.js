@@ -49,12 +49,21 @@ app.get("/isAvailable/:id", async (req, res, next) => {
   }
 });
 
+app.post("/createMany", (req, res) => {
+  const parks = req.body;
+  Park.insertMany(parks)
+    .then(() => {
+      res.status(200).send("Added successfully");
+    })
+    .catch((err) => res.status(404).send("Failed to add parking"));
+});
+
 app.post("/create", multipartMiddleware, async (req, res) => {
   const newPark = new Park(req.body);
 
   const imageExt = req.files.image.name.split('.').pop();
   const newImageName = `${newPark._id}.${imageExt}`;
-  newPark.imagePath = newImageName;
+  newPark.image = newImageName;
   const newImagePath = `./parking_images/${newImageName}`;
 
   await fs.readFile(req.files.image.path, async function (err, data) {
@@ -85,6 +94,17 @@ app.get("/image/:imageName", async (req, res, next) => {
   } else {
     res.sendFile(path.resolve(defaultFilePath));
   }
+});
+
+app.put("/edit", async (req, res) => {
+  const park = new Park(req.body);
+  const query = { _id: park._id };
+
+  const doc = await Park.findOneAndUpdate(query, park, {
+    returnOriginal: false,
+  });
+
+  res.json(doc);
 });
 
 app.put("/:id", async (req, res) => {

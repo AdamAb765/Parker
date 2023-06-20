@@ -108,7 +108,7 @@ export default function AddParking({ navigation, route }) {
                         {parkingImage ?
                             <Image style={styles.avatar}
                                 resizeMode='contain'
-                                source={{uri:parkingImage.uri}}
+                                source={{ uri: parkingImage.uri ? parkingImage.uri : parkingImage }}
                             />
                             :
                             <Image style={styles.avatar}
@@ -169,17 +169,16 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     header: {
-        height: '20%',
-        width: '100%',
-        marginBottom: 20
+        height: '43%',
+        width: '100%'
     },
     headerContent: {
         alignItems: 'center',
     },
     avatar: {
-        minWidth: '50%',
-        maxWidth: '100%',
-        height: '100%',
+        width: 370,
+        height: 240,
+        marginTop: 5
     },
     name: {
         fontSize: 22,

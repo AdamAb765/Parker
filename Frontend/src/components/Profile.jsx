@@ -7,8 +7,11 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import * as Location from "expo-location";
 import { View } from "react-native";
+import axios from "axios";
 import Icon from "@expo/vector-icons/MaterialCommunityIcons";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
@@ -19,21 +22,58 @@ export default function Profile({ navigation, route }) {
   const [descriptionInput, setDescriptionInput] = useState("");
   const [locationInput, setLocationInput] = useState("");
 
-  const [userDisplayName, setUserDisplayName] = useState("");
+  const HomeStack = createNativeStackNavigator();
 
-  useEffect(() => {
-    async function fetchUserDisplayName() {
-      setUserDisplayName(await getUserDisplayName());
+  const HomeStackScreen = () => {
+    return (
+      <HomeStack.Navigator>
+        <HomeStack.Screen
+          options={{ headerShown: false }}
+          name="Map"
+          component={HomeScreen}
+        />
+        <HomeStack.Screen name="Parking" component={Parking} />
+      </HomeStack.Navigator>
+    );
+  };
+
+  const onCheckBoxPress = () => {
+    setUseMyLocation(!useMyLocation);
+  };
+
+  const getMyLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      return;
     }
-    fetchUserDisplayName()
-  }, [])
 
-  const getUserDisplayName = async () => {
-    const user = await JSON.parse(await AsyncStorage.getItem("@user"));
+    let location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+      enableHighAccuracy: true,
+      timeInterval: 5,
+    });
 
-    if (user.firstName && user.lastName)
-      return `${user.firstName} ${user.lastName}`;
-    else return "moshe jeff";
+    return location;
+  };
+
+  const getGeoLocationFromInput = async () => {
+    const searchInputResult = await axios.get(
+      `https://maps.googleapis.com/maps/api/geocode/json?&address=${locationInput}&key=AIzaSyCZ-6i7NFhGDzMJl1546n-2EI0laWUc2Hc`
+    );
+    const firstSearchResult = searchInputResult.data.results[0];
+
+    let locationToReturn = null;
+
+    if (firstSearchResult && firstSearchResult.geometry) {
+      locationToReturn = {
+        coords: {
+          latitude: firstSearchResult.geometry.location.lat,
+          longitude: firstSearchResult.geometry.location.lng,
+        },
+      };
+    }
+
+    return locationToReturn;
   };
 
   return (
@@ -46,7 +86,7 @@ export default function Profile({ navigation, route }) {
               uri: "https://cdn-icons-png.flaticon.com/512/6596/6596121.png",
             }}
           />
-          <Text style={styles.name}>{userDisplayName}</Text>
+          <Text style={styles.name}>{auth.currentUser?.displayName}</Text>
           <View style={styles.statsContainer}>
             <View style={styles.statsBox}>
               <Text style={styles.statsLabel}>
@@ -98,7 +138,10 @@ export default function Profile({ navigation, route }) {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{...styles.option, marginTop: 30}} onPress={() => signOut(auth)}>
+        <TouchableOpacity style={{ ...styles.option, marginTop: 30 }} onPress={async () => {
+          await AsyncStorage.removeItem("@user");
+          signOut(auth)
+        }}>
           <View style={styles.optionBody}>
             <Text adjustsFontSizeToFit style={styles.logOutText}>
               Log Out
@@ -124,7 +167,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff",
-    borderWidth: 1,
+    borderWidth: "1px",
     borderColor: "#a4adba",
   },
   optionBody: {
