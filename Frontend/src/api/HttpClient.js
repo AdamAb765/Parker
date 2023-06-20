@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const SERVER_IP = "http://193.106.55.134";
-//const SERVER_IP = "http://10.100.102.26";
+//const SERVER_IP = "http://10.0.0.14";
 const SERVER_PORT = "3000";
 const REQUEST_SUCESS_STATUS = 200;
 
@@ -20,14 +20,12 @@ export const get = async (route) => {
   return result;
 };
 
-export const post = async (route, body) => {
+export const post = async (route, body, headers={"Content-Type": "application/json"}) => {
   let result;
   const url = `${SERVER_IP}:${SERVER_PORT}/${route}`;
 
   const res = await axios.post(url, body, {
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: headers
   });
 
   if (res.status === REQUEST_SUCESS_STATUS) {
@@ -37,14 +35,12 @@ export const post = async (route, body) => {
   return result;
 };
 
-export const put = async (route, body) => {
+export const put = async (route, body, headers={"Content-Type": "application/json"}) => {
   let result;
   const url = `${SERVER_IP}:${SERVER_PORT}/${route}`;
 
   const res = await axios.put(url, body, {
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: headers
   });
 
   if (res.status === REQUEST_SUCESS_STATUS) {

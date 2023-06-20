@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Stack, TextInput, Button, IconButton } from "@react-native-material/core";
-import { StyleSheet, Text, View, Alert, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Stack, TextInput, Button, IconButton, } from "@react-native-material/core";
+import { StyleSheet, Text, View, Alert, Image, Keyboard, KeyboardAvoidingView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from '../../firebase';
@@ -18,6 +18,22 @@ export default function SignUpScreen({ navigation }) {
     const [passwordInput, setPasswordInput] = useState('');
     const [secondPasswordInput, setSecondPasswordInput] = useState('');
     const [contactNumber, setContactNumber] = useState('')
+    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+    useEffect(() => {
+        const keyboardDidShowListener = Keyboard.addListener('keyboardWillShow', () => {
+            setIsKeyboardOpen(true);
+        });
+        const keyboardDidHideListener = Keyboard.addListener('keyboardWillHide', () => {
+            setIsKeyboardOpen(false);
+        });
+
+        // Clean up listeners
+        return () => {
+            keyboardDidShowListener.remove();
+            keyboardDidHideListener.remove();
+        };
+    }, []);
 
     const firstPasswordToggle = useTogglePasswordVisibility();
     const secondPasswordToggle = useTogglePasswordVisibility();
@@ -39,7 +55,7 @@ export default function SignUpScreen({ navigation }) {
             } else {
                 await createUserWithEmailAndPassword(auth, emailInput, passwordInput)
                     .then(async (userCredential) => {
-                        await http.post('users/create', userToAdd)
+                        //await http.post('users/create', userToAdd)
                     })
                     .catch((error) => {
                         Alert.alert('Failed!', `${error.message}`);
@@ -68,7 +84,9 @@ export default function SignUpScreen({ navigation }) {
     }
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
             <Image
                 style={styles.logo}
                 source={require("../../assets/ParkerLogo.png")}
@@ -152,7 +170,7 @@ export default function SignUpScreen({ navigation }) {
                 uppercase={false}
                 onPress={() => navigation.navigate('Login')}
             />
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 

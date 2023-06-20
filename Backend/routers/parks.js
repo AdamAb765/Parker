@@ -81,7 +81,7 @@ app.post("/create", multipartMiddleware, async (req, res) => {
       res.status(200).send("Added successfully");
     })
     .catch((err) => {
-      fs.unlink(newImagePath, (e) => console.log(e));
+      fs.unlink(newImagePath, (e) => console.log("unlinking image"));
       res.status(404).send("Failed to add parking");
     });
 });
@@ -99,7 +99,7 @@ app.get("/image/:imageName", async (req, res, next) => {
 app.put("/edit", async (req, res) => {
   const park = new Park(req.body);
   const query = { _id: park._id };
-
+  
   const doc = await Park.findOneAndUpdate(query, park, {
     returnOriginal: false,
   });
@@ -108,7 +108,6 @@ app.put("/edit", async (req, res) => {
 });
 
 app.put("/:id", async (req, res) => {
-  console.log(req.body);
   const { licensePlate, pictureDateTime } = req.body;
 
   const park = await Park.findById(req.params.id);
@@ -125,13 +124,13 @@ app.put("/:id", async (req, res) => {
 });
 
 app.put("/:_id/image", multipartMiddleware, async (req, res) => {
+  console.log(req)
   const query = { _id: req.params._id };
   const park = await Park.findOne(query);
   if (!park) {
     res.status(404).send("Parking not found");
     return;
   }
-
   const imageExt = req.files.image.name.split('.').pop();
   const newImageName = `${park._id}.${imageExt}`;
   const newImagePath = `./parking_images/${newImageName}`;
@@ -145,19 +144,19 @@ app.put("/:_id/image", multipartMiddleware, async (req, res) => {
       });
   });
   
-  let oldImageName = park.imagePath;
-  park.imagePath = newImageName;
+  let oldImageName = park.image;
+  park.image = newImageName;
 
   Park.updateOne(query, { $set: park })
   .then(() => {
     if (oldImageName !== newImageName) {
-      fs.unlink(`./parking_images/${oldImageName}`, (e) => console.log(e));
+      fs.unlink(`./parking_images/${oldImageName}`, (e) => console.log("unlinking image"));
     }
     res.status(200).send("Added successfully");
   })
   .catch((err) => {
     if (oldImageName !== newImageName) {
-      fs.unlink(newImagePath, (e) => console.log(e));
+      fs.unlink(newImagePath, (e) => console.log("unlinking image"));
     }
     res.status(404).send("Failed to add parking");
   });
@@ -170,7 +169,7 @@ app.put("/setCamera", async (req, res) => {
     cameraPort: req.body.cameraPort,
     cameraIpAddress: req.body.cameraIpAddress,
   };
-  console.log(camera);
+
   const doc = await Park.findOneAndUpdate(query, camera, {
     returnOriginal: false,
     multi: true,

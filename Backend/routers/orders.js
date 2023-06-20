@@ -86,7 +86,6 @@ app.get("/byParkAndConsumer/:parkId/:consumerId", async (req, res) => {
 });
 
 app.get("/orderByConsumer/:consumerId", async (req, res) => {
-  console.log('order by cunsumer')
   const query = { consumerId: req.params.consumerId };
   const order = await Order.find(query);
   res.json(order);
